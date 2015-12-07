@@ -1,0 +1,26 @@
+{
+  "name": "codeclimate-tslint",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tkqubo/codeclimate-tslint.git"
+  },
+  "keywords": [
+    "TypeScript"
+  ],
+  "author": "tkqubo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tkqubo/codeclimate-tslint/issues"
+  },
+  "homepage": "https://github.com/tkqubo/codeclimate-tslint#readme",
+  "devDependencies": {
+    "tslint": "^3.1.1",
+    "typescript": "^1.7.3"
+  }
+}
