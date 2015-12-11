@@ -5,13 +5,6 @@ machine:
     CLOUDSDK_CORE_DISABLE_PROMPTS: 1
     repository: tkqubo/codeclimate-tslint
 
-#dependencies:
-#  pre:
-#    - echo $gcloud_json_key_base64 | sed 's/ //g' | base64 -d > /tmp/gcloud_key.json
-#    - curl https://sdk.cloud.google.com | bash
-#    - gcloud auth activate-service-account $gcloud_account_email --key-file /tmp/gcloud_key.json
-#    - gcloud docker -a
-
 test:
   override:
     - docker build -t=$repository:b$CIRCLE_BUILD_NUM .
@@ -20,6 +13,16 @@ deployment:
   registry:
     branch: master
     commands:
+      - mkdir ~/.docker
+      - |
+          cat > ~/.docker/config.json << EOF
+          {
+            "auths": {
+              "https://index.docker.io/v1/": {
+                "auth": "$DOCKER_AUTH",
+                "email": "$DOCKER_EMAIL"
+              }
+            }
+          }
+          EOF
       - docker push $repository:b$CIRCLE_BUILD_NUM
-
-
