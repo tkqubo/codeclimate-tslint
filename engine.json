@@ -1,0 +1,11 @@
+{
+  "name": "tslint",
+  "description": "Code Climate tslint-Engine",
+  "maintainer": {
+    "name": "tkqubo",
+    "email": "tk.qubo@gmail.com"
+  },
+  "languages" : ["TypeScript"],
+  "version": "000000",
+  "spec_version": "0.0.1"
+}
