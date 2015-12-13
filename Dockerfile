@@ -12,5 +12,5 @@ USER app
 
 COPY . /usr/src/app
 
-CMD ["/usr/src/app/node_modules/.bin/tslint"]
+CMD ["node", "/usr/src/app/bin/index.js"]
 
