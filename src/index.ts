@@ -1,7 +1,7 @@
 'use strict';
 import * as Linter from 'tslint';
-import * as Promise from 'bluebird';
 import * as fs from 'fs';
+import * as rx from 'rx';
 
 let configuration = {
   rules: {
@@ -24,19 +24,6 @@ interface CodeClimateEngineConfig {
   }
 }
 
-
-// a wrapper for emitting perf timing
-function runWithTiming<T>(name: string, done: (callback: (result: T) => void) => void): Promise<T> {
-  let start = new Date();
-  return new Promise<T>((resolve, reject) => {
-    done((result: T) => {
-      let duration = (new Date().getTime() - start.getTime()) / 1000;
-      console.error(`tslint.timing.${name}: ${duration}s`);
-      resolve(result);
-    });
-  });
-}
-
 interface FileListBuilder {
   (): string[];
 }
@@ -49,23 +36,17 @@ function exclusionBasedFileListBuilder(paths: string[]): FileListBuilder {
   return () => ['src/index.ts'];
 }
 
-function loadConfig(configFileName: string): Promise<CodeClimateEngineConfig> {
-  return runWithTiming<FileListBuilder>("engineConfig", (callback: (result: FileListBuilder) => void) =>
-    fs.readFile(configFileName, (err, buffer) => {
-      var engineConfig: CodeClimateEngineConfig = !!buffer ? JSON.parse(buffer.toString("utf-8")) : {};
-      if (engineConfig.include_paths) {
-        callback(inclusionBasedFileListBuilder(engineConfig.include_paths));
-      } else {
-        callback(exclusionBasedFileListBuilder(engineConfig.exclude_paths || []));
-      }
-    })
-  )
-}
-
-function listFiles(builder: FileListBuilder): Promise<string[]> {
-  return runWithTiming<string[]>("buildFileList", (callback => {
-    callback(builder());
-  }));
+function loadConfig(configFileName: string): rx.Observable<CodeClimateEngineConfig> {
+  return rx.Observable
+    .fromNodeCallback(fs.readFile)(configFileName)
+    .catch((err: Error) => rx.Observable.return(null))
+    .map<CodeClimateEngineConfig>((buffer: Buffer) => !!buffer ? JSON.parse(buffer.toString("utf-8")) : {})
+    .map<FileListBuilder>((engineConfig: CodeClimateEngineConfig) =>
+      engineConfig.include_paths ?
+        inclusionBasedFileListBuilder(engineConfig.include_paths):
+        exclusionBasedFileListBuilder(engineConfig.exclude_paths || [])
+    )
+  ;
 }
 
 function processFile(fileName: string): void {
@@ -76,5 +57,6 @@ function processFile(fileName: string): void {
 }
 
 loadConfig("/config.json")
-  .then(listFiles)
-  .then(files => files.forEach(processFile));
+  .flatMap((builder: FileListBuilder) => builder())
+  .subscribe(processFile)
+;
