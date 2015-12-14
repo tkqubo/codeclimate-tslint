@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/tkqubo/codeclimate-tslint#readme",
   "devDependencies": {
+    "bluebird": "^3.0.6",
     "tsd": "^0.6.5",
     "tslint": "^3.1.1",
     "typescript": "^1.7.3"
