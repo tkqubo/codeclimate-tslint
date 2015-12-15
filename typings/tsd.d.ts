@@ -18,3 +18,6 @@
 /// <reference path="rx/rx.time-lite.d.ts" />
 /// <reference path="rx/rx.time.d.ts" />
 /// <reference path="rx/rx.virtualtime.d.ts" />
+/// <reference path="glob/glob.d.ts" />
+/// <reference path="minimatch/minimatch.d.ts" />
+/// <reference path="node/node.d.ts" />

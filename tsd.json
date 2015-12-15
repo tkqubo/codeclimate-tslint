@@ -58,6 +58,15 @@
     },
     "rx/rx.backpressure.d.ts": {
       "commit": "8ea42cd8bb11863ed6f242d67c502288ebc45a7b"
+    },
+    "glob/glob.d.ts": {
+      "commit": "6e1f597477707df47003d76664d90bb323ec5890"
+    },
+    "minimatch/minimatch.d.ts": {
+      "commit": "6e1f597477707df47003d76664d90bb323ec5890"
+    },
+    "node/node.d.ts": {
+      "commit": "6e1f597477707df47003d76664d90bb323ec5890"
     }
   }
 }

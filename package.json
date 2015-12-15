@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/tkqubo/codeclimate-tslint#readme",
   "devDependencies": {
+    "glob": "^6.0.1",
     "tsd": "^0.6.5",
     "typescript": "^1.7.3"
   },
