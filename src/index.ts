@@ -3,6 +3,7 @@ import * as Linter from 'tslint';
 import * as fs from 'fs';
 import * as glob from 'glob';
 import * as rx from 'rx';
+import * as _ from 'lodash';
 
 let configuration = {
   rules: {
@@ -65,26 +66,24 @@ function inclusionBasedFileListBuilder(includePaths: string[]): FileListBuilder 
   // Uses glob to expand the files and directories in includePaths, filtering
   // down to match the list of desired extensions.
   return (extensions: string[]) => {
-    var analysisFiles: string[] = [];
+    let [directories, files] = _.partition(includePaths, /\/$/.test);
 
-    includePaths.forEach(fileOrDirectory => {
-      if (/\/$/.test(fileOrDirectory)) {
-        // if it ends in a slash, expand and push
-        var filesInThisDirectory = glob.sync(`/code/${fileOrDirectory}/**/**`);
-        prunePathsWithinSymlinks(filesInThisDirectory)
-          .filter((file) => isFileWithMatchingExtension(file, extensions))
-          .forEach(file => analysisFiles.push(file))
-        ;
-      } else {
-        // if not, check for ending in *.js
-        var fullPath = `/code/${fileOrDirectory}`;
-        if (isFileWithMatchingExtension(fullPath, extensions)) {
-          analysisFiles.push(fullPath);
-        }
-      }
-    });
+    let filesFromDirectories: string[] = _.flatten(
+      _.chain(directories)
+      .map((directory: string) => glob.sync(`/code/${directory}/**/**`))
+      .map(prunePathsWithinSymlinks)
+      .value()
+    )
+      .filter((file: string) => isFileWithMatchingExtension(file, extensions))
+    ;
 
-    return analysisFiles;
+    let filesFromFiles: string[] = _.chain(files)
+      .map((file: string) => `/code/${file}`)
+      .filter((file: string) => isFileWithMatchingExtension(file, extensions))
+      .value()
+    ;
+
+    return filesFromDirectories.concat(filesFromFiles);
   };
 }
 
