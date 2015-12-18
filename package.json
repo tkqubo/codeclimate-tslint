@@ -4,11 +4,17 @@
   "description": "",
   "main": "bin/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "install": "tsd --config tsd.json reinstall --overwrite",
     "clean": "rm -rfv bin",
-    "build": "npm run clean && tsc",
-    "start": "node bin/index.js"
+    "build": "npm run clean && tsc && npm run dist",
+    "dist": "mkdir -pv bin && cp -v src/*.js bin/",
+    "start": "node bin/index.js",
+    "test": "npm run build && npm run istanbul",
+    "test:watch": "npm run build && npm run istanbul:watch",
+    "test:mocha": "npm run build && npm run mocha",
+    "mocha": "mocha --compilers ts:espower-typescript/guess test/*.spec.ts",
+    "istanbul": "istanbul cover _mocha -- --compilers ts:espower-typescript/guess test/*.spec.ts",
+    "istanbul:watch": "istanbul cover node_modules/.bin/_mocha -- --compilers ts:espower-typescript/guess test/*.spec.ts -w"
   },
   "repository": {
     "type": "git",
@@ -24,9 +30,14 @@
   },
   "homepage": "https://github.com/tkqubo/codeclimate-tslint#readme",
   "devDependencies": {
+    "espower-typescript": "^3.0.0",
     "glob": "^6.0.1",
+    "istanbul": "^0.4.1",
+    "mocha": "^2.3.4",
+    "power-assert": "^1.2.0",
+    "sinon": "^1.17.2",
     "tsd": "^0.6.5",
-    "typescript": "^1.7.3"
+    "typescript": "^1.7.5"
   },
   "dependencies": {
     "lodash": "^3.10.1",

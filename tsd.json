@@ -70,6 +70,21 @@
     },
     "lodash/lodash.d.ts": {
       "commit": "11322524f8db9cdb921427cad84cd22fe2d4f965"
+    },
+    "sinon/sinon.d.ts": {
+      "commit": "11322524f8db9cdb921427cad84cd22fe2d4f965"
+    },
+    "power-assert/power-assert.d.ts": {
+      "commit": "11322524f8db9cdb921427cad84cd22fe2d4f965"
+    },
+    "power-assert-formatter/power-assert-formatter.d.ts": {
+      "commit": "11322524f8db9cdb921427cad84cd22fe2d4f965"
+    },
+    "empower/empower.d.ts": {
+      "commit": "11322524f8db9cdb921427cad84cd22fe2d4f965"
+    },
+    "mocha/mocha.d.ts": {
+      "commit": "11322524f8db9cdb921427cad84cd22fe2d4f965"
     }
   }
 }

@@ -4,9 +4,7 @@
     "target": "es5",
     "noImplicitAny": true,
     "experimentalDecorators": true,
-    "outDir": "bin",
-    "rootDir": "src",
-    "declaration": true
+    "rootDir": "."
   },
   "exclude": [
     "node_modules"
