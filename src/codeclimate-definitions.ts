@@ -1,13 +1,16 @@
 'use strict';
 
+export type Location = LineLocation|PositionLocation;
+export type Position = LineColumnPosition|OffsetPosition;
+
 export interface Issue {
   type: string;
   check_name: string;
   description: string;
   content?: Contents;
   categories: string[];
-  location: LinePosition|PositionLocation;
-  other_locations?: (LinePosition|PositionLocation)[];
+  location: Location;
+  other_locations?: Location[];
   trace?: Trace;
   remediation_points?: number;
   severity?: string;
@@ -18,7 +21,7 @@ export interface Contents {
   body: string;
 }
 
-export interface LinePosition {
+export interface LineLocation {
   path: string;
   lines: {
     begin: number;
@@ -29,8 +32,8 @@ export interface LinePosition {
 export interface PositionLocation {
   path: string;
   positions: {
-    begin: LineColumnPosition|OffsetPosition;
-    end: LineColumnPosition|OffsetPosition;
+    begin: Position;
+    end: Position;
   }
 }
 
@@ -44,6 +47,28 @@ export interface OffsetPosition {
 }
 
 export interface Trace {
-  locations: (LinePosition|PositionLocation)[];
+  locations: Location[];
   stacktrace?: boolean;
 }
+
+export namespace IssueTypes {
+  export const Issue = 'issue';
+}
+
+export namespace Categories {
+  export const BugRisk = 'Bug Risk';
+  export const Clarity = 'Clarity';
+  export const Compatibility = 'Compatibility';
+  export const Complexity = 'Complexity';
+  export const Duplication = 'Duplication';
+  export const Performance = 'Performance';
+  export const Security = 'Security';
+  export const Style = 'Style';
+}
+
+export namespace Severities {
+  export const Info = 'info';
+  export const Normal = 'normal';
+  export const Critical = 'critical';
+}
+
