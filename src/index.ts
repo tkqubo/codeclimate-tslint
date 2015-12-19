@@ -101,11 +101,11 @@ function loadConfig(configFileName: string): rx.Observable<CodeClimateEngineConf
 }
 
 function processFile(fileName: string): void {
-  console.error(`process: ${fileName}`);
+  console.error(`processing: ${fileName}`);
   let contents = fs.readFileSync(fileName, "utf8");
   let linter = new Linter(fileName, contents, options);
   let result = linter.lint();
-  console.log(result);
+  console.dir(result);
 }
 
 loadConfig("/config.json")
