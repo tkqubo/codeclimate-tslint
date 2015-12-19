@@ -1,19 +1,24 @@
 'use strict';
-import * as Linter from 'tslint';
 import * as fs from 'fs';
 import * as glob from 'glob';
-import * as rx from 'rx';
 import * as _ from 'lodash';
+import * as rx from 'rx';
+import * as ts from "typescript";
+import * as Linter from 'tslint';
+import {ILinterOptions} from 'tslint/lib/lint';
+import {RuleFailure} from "tslint/lib/language/rule/rule";
 
-let configuration = {
-  rules: {
-    "variable-name": true,
-    "quotemark": [true, "double"]
-  }
-};
-let options = {
+import * as CodeClimate from './codeclimate-definitions';
+import {CodeClimateConverter} from './codeclimate-converter';
+
+let options: ILinterOptions = {
   formatter: "json",
-  configuration: configuration,
+  configuration: {
+    rules: {
+      "variable-name": true,
+      "quotemark": [true, "double"]
+    }
+  },
   rulesDirectory: "customRules/", // can be an array of directories
   formattersDirectory: "customFormatters/"
 };
@@ -21,13 +26,10 @@ let options = {
 interface CodeClimateEngineConfig {
   include_paths?: string[];
   exclude_paths?: string[];
-  config?: {
-    debug?: boolean;
-  }
 }
 
 interface FileListBuilder {
-  (extensions: string[]): string[];
+  (extensions: string[]): rx.Observable<string>;
 }
 
 function isFileWithMatchingExtension(file: string, extensions: string[]): boolean {
@@ -41,21 +43,18 @@ function isFileWithMatchingExtension(file: string, extensions: string[]): boolea
 }
 
 function prunePathsWithinSymlinks(paths: string[]): string[] {
-  // Extracts symlinked paths and filters them out, including any child paths
   var symlinks = paths.filter((path) => fs.lstatSync(path).isSymbolicLink());
   return paths.filter(path => symlinks.every(symlink => path.indexOf(symlink) != 0));
 }
 
 function exclusionBasedFileListBuilder(excludePaths: string[]): FileListBuilder {
-  // Uses glob to traverse code directory and find files to analyze,
-  // excluding files passed in with by CLI config, and including only
-  // files in the list of desired extensions.
-  //
-  // Deprecated style of file expansion, supported for users of the old CLI.
-  return (extensions: string[]) => {
-    var allFiles = glob.sync("/code/**/**", {});
-    return prunePathsWithinSymlinks(allFiles)
-      .filter(file => excludePaths.indexOf(file.split("/code/")[1]) < 0)
+  return (extensions: string[]): rx.Observable<string> => {
+    // lodash currently cannot chain `flatten()`
+    let expandedExcludePaths: string[] = _.flatten(excludePaths.map(path => glob.sync(`/code/${path}`)));
+    var allFiles = glob.sync("/code/**/**");
+    return rx.Observable
+      .fromArray(prunePathsWithinSymlinks(allFiles))
+      .filter(file => expandedExcludePaths.indexOf(file) === -1)
       .filter(file => fs.lstatSync(file).isFile())
       .filter(file => isFileWithMatchingExtension(file, extensions))
     ;
@@ -63,27 +62,19 @@ function exclusionBasedFileListBuilder(excludePaths: string[]): FileListBuilder 
 }
 
 function inclusionBasedFileListBuilder(includePaths: string[]): FileListBuilder {
-  // Uses glob to expand the files and directories in includePaths, filtering
-  // down to match the list of desired extensions.
-  return (extensions: string[]) => {
-    let [directories, files] = _.partition(includePaths, /\/$/.test);
+  return (extensions: string[]): rx.Observable<string> => {
+    // lodash currently cannot chain `flatten()`
+    let expandedIncludePaths: string[] = _.flatten(includePaths.map(path => glob.sync(`/code/${path}`)));
+    // currently rxjs cannot use partition
+    let [directories, files] = _.partition(expandedIncludePaths, file => fs.lstatSync(file).isDirectory());
 
-    let filesFromDirectories: string[] = _.flatten(
-      _.chain(directories)
-      .map((directory: string) => glob.sync(`/code/${directory}/**/**`))
-      .map(prunePathsWithinSymlinks)
-      .value()
-    )
-      .filter((file: string) => isFileWithMatchingExtension(file, extensions))
+    return rx.Observable
+      .fromArray(directories)
+      .map(directory => glob.sync(`${directory}/**/**`))
+      .flatMap(prunePathsWithinSymlinks)
+      .concat(rx.Observable.fromArray(files))
+      .filter(file => isFileWithMatchingExtension(file, extensions))
     ;
-
-    let filesFromFiles: string[] = _.chain(files)
-      .map((file: string) => `/code/${file}`)
-      .filter((file: string) => isFileWithMatchingExtension(file, extensions))
-      .value()
-    ;
-
-    return filesFromDirectories.concat(filesFromFiles);
   };
 }
 
@@ -101,11 +92,15 @@ function loadConfig(configFileName: string): rx.Observable<CodeClimateEngineConf
 }
 
 function processFile(fileName: string): void {
-  console.error(`processing: ${fileName}`);
   let contents = fs.readFileSync(fileName, "utf8");
   let linter = new Linter(fileName, contents, options);
-  let result = linter.lint();
-  console.dir(result);
+  let converter = new CodeClimateConverter();
+  linter.lint().failures
+    .map(converter.convert)
+    .map(JSON.stringify)
+    .map(json => `${json}\u0000`)
+    .forEach(output => console.log(output))
+  ;
 }
 
 loadConfig("/config.json")
