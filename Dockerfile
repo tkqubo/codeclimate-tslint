@@ -2,6 +2,7 @@ FROM mhart/alpine-node
 
 WORKDIR /usr/src/app
 COPY package.json /usr/src/app/
+COPY tslint.json /usr/src/app/
 
 RUN apk --update add git
 

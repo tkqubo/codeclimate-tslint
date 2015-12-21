@@ -15,7 +15,7 @@ import {CodeClimateConverter} from './codeclimate-converter';
 interface CodeClimateEngineConfig {
   include_paths?: string[];
   exclude_paths?: string[];
-  rules: any;
+  rules?: any;
 }
 
 type FileListBuilder = (extensions: string[]) => rx.Observable<string>
@@ -86,7 +86,7 @@ function linterOption(engineConfig: CodeClimateEngineConfig): ILinterOptions {
   return {
     formatter: "json",
     configuration: {
-      rules: engineConfig.rules
+      rules: engineConfig.rules || JSON.parse(fs.readFileSync("./tslint.json").toString()).rules
     },
     formattersDirectory: "customRules/",
     rulesDirectory: "customFormatters/"
