@@ -1,14 +1,14 @@
 {
   "name": "codeclimate-tslint",
   "version": "0.1.0",
-  "description": "",
+  "description": "Code Climate TSLint-Engine for TypeScript",
   "main": "bin/index.js",
   "scripts": {
     "install": "tsd --config tsd.json reinstall --overwrite",
     "clean": "rm -rfv bin",
     "build": "npm run clean && tsc && npm run dist",
     "dist": "mkdir -pv bin && cp -v src/*.js bin/",
-    "start": "npm run build && docker build --rm -t tkqubo/codeclimate-tslint . && docker run -v $(pwd)/src:/code -v $(pwd)/config.json:/config.json tkqubo/codeclimate-tslint",
+    "start": "npm run build && docker build --rm -t tkqubo/codeclimate-tslint . && docker run -v $(pwd):/code -v $(pwd)/config.json:/config.json tkqubo/codeclimate-tslint",
     "test": "npm run build && npm run istanbul",
     "test:watch": "npm run build && npm run istanbul:watch",
     "test:mocha": "npm run build && npm run mocha",
@@ -42,6 +42,6 @@
   "dependencies": {
     "lodash": "^3.10.1",
     "rx": "^4.0.7",
-    "tslint": "^3.2.0"
+    "tslint": "^3.2.1"
   }
 }

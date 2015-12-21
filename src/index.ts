@@ -1,3 +1,4 @@
+import {IRule} from "tslint/lib/language/rule/rule";
 'use strict';
 import * as fs from 'fs';
 import * as glob from 'glob';
@@ -11,26 +12,13 @@ import {RuleFailure} from "tslint/lib/language/rule/rule";
 import * as CodeClimate from './codeclimate-definitions';
 import {CodeClimateConverter} from './codeclimate-converter';
 
-let options: ILinterOptions = {
-  formatter: "json",
-  configuration: {
-    rules: {
-      "variable-name": true,
-      "quotemark": [true, "double"]
-    }
-  },
-  rulesDirectory: "customRules/", // can be an array of directories
-  formattersDirectory: "customFormatters/"
-};
-
 interface CodeClimateEngineConfig {
   include_paths?: string[];
   exclude_paths?: string[];
+  rules: any;
 }
 
-interface FileListBuilder {
-  (extensions: string[]): rx.Observable<string>;
-}
+type FileListBuilder = (extensions: string[]) => rx.Observable<string>
 
 function isFileWithMatchingExtension(file: string, extensions: string[]): boolean {
   var stats = fs.lstatSync(file);
@@ -83,15 +71,29 @@ function loadConfig(configFileName: string): rx.Observable<CodeClimateEngineConf
     .fromNodeCallback(fs.readFile)(configFileName)
     .catch((err: Error) => rx.Observable.return(null))
     .map<CodeClimateEngineConfig>((buffer: Buffer) => !!buffer ? JSON.parse(buffer.toString("utf-8")) : {})
-    .map<FileListBuilder>((engineConfig: CodeClimateEngineConfig) =>
-      engineConfig.include_paths ?
-        inclusionBasedFileListBuilder(engineConfig.include_paths):
-        exclusionBasedFileListBuilder(engineConfig.exclude_paths || [])
-    )
   ;
 }
 
-function processFile(fileName: string): void {
+function filesAndOptions(engineConfig: CodeClimateEngineConfig): rx.Observable<[string, ILinterOptions]> {
+  let builder: FileListBuilder = engineConfig.include_paths ?
+    inclusionBasedFileListBuilder(engineConfig.include_paths):
+    exclusionBasedFileListBuilder(engineConfig.exclude_paths || []);
+  return builder(['.ts'])
+    .map<[string, ILinterOptions]>(file => [file, linterOption(engineConfig)]);
+}
+
+function linterOption(engineConfig: CodeClimateEngineConfig): ILinterOptions {
+  return {
+    formatter: "json",
+    configuration: {
+      rules: engineConfig.rules
+    },
+    formattersDirectory: "customRules/",
+    rulesDirectory: "customFormatters/"
+  }
+}
+
+function processFile(fileName: string, options: ILinterOptions): void {
   let contents = fs.readFileSync(fileName, "utf8");
   let linter = new Linter(fileName, contents, options);
   let converter = new CodeClimateConverter();
@@ -104,6 +106,6 @@ function processFile(fileName: string): void {
 }
 
 loadConfig("/config.json")
-  .flatMap((builder: FileListBuilder) => builder(['.ts']))
-  .subscribe(processFile)
+  .flatMap(filesAndOptions)
+  .subscribe(arg => processFile(arg[0], arg[1]))
 ;
