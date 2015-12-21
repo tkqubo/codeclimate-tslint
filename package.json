@@ -1,6 +1,6 @@
 {
   "name": "codeclimate-tslint",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Code Climate TSLint-Engine for TypeScript",
   "main": "bin/index.js",
   "scripts": {
