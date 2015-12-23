@@ -1,16 +1,20 @@
-import {IRule} from "tslint/lib/language/rule/rule";
+import {IRule} from 'tslint/lib/language/rule/rule';
 'use strict';
 import * as fs from 'fs';
 import * as glob from 'glob';
 import * as _ from 'lodash';
 import * as rx from 'rx';
-import * as ts from "typescript";
+import * as ts from 'typescript';
 import * as Linter from 'tslint';
 import {ILinterOptions} from 'tslint/lib/lint';
-import {RuleFailure} from "tslint/lib/language/rule/rule";
+import {RuleFailure} from 'tslint/lib/language/rule/rule';
 
 import * as CodeClimate from './codeclimate-definitions';
 import {CodeClimateConverter} from './codeclimate-converter';
+
+const DefaultTsLintFile = './tslint.json';
+const ConfigFile = '/config.json';
+const CodeDirectoryBase = '/code/';
 
 interface CodeClimateEngineConfig {
   include_paths?: string[];
@@ -22,7 +26,7 @@ type FileListBuilder = (extensions: string[]) => rx.Observable<string>
 
 function isFileWithMatchingExtension(file: string, extensions: string[]): boolean {
   var stats = fs.lstatSync(file);
-  var extension = "." + file.split(".").pop();
+  var extension = '.' + file.split('.').pop();
   return (
     stats.isFile() &&
     !stats.isSymbolicLink()
@@ -38,8 +42,8 @@ function prunePathsWithinSymlinks(paths: string[]): string[] {
 function exclusionBasedFileListBuilder(excludePaths: string[]): FileListBuilder {
   return (extensions: string[]): rx.Observable<string> => {
     // lodash currently cannot chain `flatten()`
-    let expandedExcludePaths: string[] = _.flatten(excludePaths.map(path => glob.sync(`/code/${path}`)));
-    var allFiles = glob.sync("/code/**/**");
+    let expandedExcludePaths: string[] = _.flatten(excludePaths.map(path => glob.sync(`${CodeDirectoryBase}${path}`)));
+    var allFiles = glob.sync(`${CodeDirectoryBase}**/**`);
     return rx.Observable
       .fromArray(prunePathsWithinSymlinks(allFiles))
       .filter(file => expandedExcludePaths.indexOf(file) === -1)
@@ -52,7 +56,7 @@ function exclusionBasedFileListBuilder(excludePaths: string[]): FileListBuilder 
 function inclusionBasedFileListBuilder(includePaths: string[]): FileListBuilder {
   return (extensions: string[]): rx.Observable<string> => {
     // lodash currently cannot chain `flatten()`
-    let expandedIncludePaths: string[] = _.flatten(includePaths.map(path => glob.sync(`/code/${path}`)));
+    let expandedIncludePaths: string[] = _.flatten(includePaths.map(path => glob.sync(`${CodeDirectoryBase}${path}`)));
     // currently rxjs cannot use partition
     let [directories, files] = _.partition(expandedIncludePaths, file => fs.lstatSync(file).isDirectory());
 
@@ -70,7 +74,7 @@ function loadConfig(configFileName: string): rx.Observable<CodeClimateEngineConf
   return rx.Observable
     .fromNodeCallback(fs.readFile)(configFileName)
     .catch((err: Error) => rx.Observable.return(null))
-    .map<CodeClimateEngineConfig>((buffer: Buffer) => !!buffer ? JSON.parse(buffer.toString("utf-8")) : {})
+    .map<CodeClimateEngineConfig>((buffer: Buffer) => !!buffer ? JSON.parse(buffer.toString('utf-8')) : {})
   ;
 }
 
@@ -84,17 +88,17 @@ function filesAndOptions(engineConfig: CodeClimateEngineConfig): rx.Observable<[
 
 function linterOption(engineConfig: CodeClimateEngineConfig): ILinterOptions {
   return {
-    formatter: "json",
+    formatter: 'json',
     configuration: {
-      rules: engineConfig.rules || JSON.parse(fs.readFileSync("./tslint.json").toString()).rules
+      rules: engineConfig.rules || JSON.parse(fs.readFileSync(DefaultTsLintFile).toString()).rules
     },
-    formattersDirectory: "customRules/",
-    rulesDirectory: "customFormatters/"
+    formattersDirectory: 'customRules/',
+    rulesDirectory: 'customFormatters/'
   }
 }
 
 function processFile(fileName: string, options: ILinterOptions): void {
-  let contents = fs.readFileSync(fileName, "utf8");
+  let contents = fs.readFileSync(fileName, 'utf8');
   let linter = new Linter(fileName, contents, options);
   let converter = new CodeClimateConverter();
   linter.lint().failures
@@ -105,7 +109,7 @@ function processFile(fileName: string, options: ILinterOptions): void {
   ;
 }
 
-loadConfig("/config.json")
+loadConfig(ConfigFile)
   .flatMap(filesAndOptions)
   .subscribe(arg => processFile(arg[0], arg[1]))
 ;
