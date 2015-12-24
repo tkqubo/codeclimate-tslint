@@ -2,7 +2,7 @@
 import * as ts from "typescript";
 import {RuleFailure,RuleFailurePosition} from "tslint/lib/language/rule/rule";
 
-import * as CodeClimate from './codeclimate-definitions';
+import * as CodeClimate from './codeclimateDefinitions';
 
 export class CodeClimateConverter {
   constructor() {

@@ -1,4 +1,3 @@
-import {IRule} from 'tslint/lib/language/rule/rule';
 'use strict';
 import * as fs from 'fs';
 import * as glob from 'glob';
@@ -8,9 +7,10 @@ import * as ts from 'typescript';
 import * as Linter from 'tslint';
 import {ILinterOptions} from 'tslint/lib/lint';
 import {RuleFailure} from 'tslint/lib/language/rule/rule';
+import {FileMatcher} from './fileMatcher';
 
-import * as CodeClimate from './codeclimate-definitions';
-import {CodeClimateConverter} from './codeclimate-converter';
+import * as CodeClimate from './codeclimateDefinitions';
+import {CodeClimateConverter} from './codeclimateConverter';
 
 const DefaultTsLintFile = './tslint.json';
 const ConfigFile = '/config.json';
@@ -22,54 +22,6 @@ interface CodeClimateEngineConfig {
   rules?: any;
 }
 
-type FileListBuilder = (extensions: string[]) => rx.Observable<string>
-
-function isFileWithMatchingExtension(file: string, extensions: string[]): boolean {
-  var stats = fs.lstatSync(file);
-  var extension = '.' + file.split('.').pop();
-  return (
-    stats.isFile() &&
-    !stats.isSymbolicLink()
-    && extensions.indexOf(extension) >= 0
-  );
-}
-
-function prunePathsWithinSymlinks(paths: string[]): string[] {
-  var symlinks = paths.filter((path) => fs.lstatSync(path).isSymbolicLink());
-  return paths.filter(path => symlinks.every(symlink => path.indexOf(symlink) != 0));
-}
-
-function exclusionBasedFileListBuilder(excludePaths: string[]): FileListBuilder {
-  return (extensions: string[]): rx.Observable<string> => {
-    // lodash currently cannot chain `flatten()`
-    let expandedExcludePaths: string[] = _.flatten(excludePaths.map(path => glob.sync(`${CodeDirectoryBase}${path}`)));
-    var allFiles = glob.sync(`${CodeDirectoryBase}**/**`);
-    return rx.Observable
-      .fromArray(prunePathsWithinSymlinks(allFiles))
-      .filter(file => expandedExcludePaths.indexOf(file) === -1)
-      .filter(file => fs.lstatSync(file).isFile())
-      .filter(file => isFileWithMatchingExtension(file, extensions))
-    ;
-  };
-}
-
-function inclusionBasedFileListBuilder(includePaths: string[]): FileListBuilder {
-  return (extensions: string[]): rx.Observable<string> => {
-    // lodash currently cannot chain `flatten()`
-    let expandedIncludePaths: string[] = _.flatten(includePaths.map(path => glob.sync(`${CodeDirectoryBase}${path}`)));
-    // currently rxjs cannot use partition
-    let [directories, files] = _.partition(expandedIncludePaths, file => fs.lstatSync(file).isDirectory());
-
-    return rx.Observable
-      .fromArray(directories)
-      .map(directory => glob.sync(`${directory}/**/**`))
-      .flatMap(prunePathsWithinSymlinks)
-      .concat(rx.Observable.fromArray(files))
-      .filter(file => isFileWithMatchingExtension(file, extensions))
-    ;
-  };
-}
-
 function loadConfig(configFileName: string): rx.Observable<CodeClimateEngineConfig> {
   return rx.Observable
     .fromNodeCallback(fs.readFile)(configFileName)
@@ -78,15 +30,14 @@ function loadConfig(configFileName: string): rx.Observable<CodeClimateEngineConf
   ;
 }
 
-function filesAndOptions(engineConfig: CodeClimateEngineConfig): rx.Observable<[string, ILinterOptions]> {
-  let builder: FileListBuilder = engineConfig.include_paths ?
-    inclusionBasedFileListBuilder(engineConfig.include_paths):
-    exclusionBasedFileListBuilder(engineConfig.exclude_paths || []);
-  return builder(['.ts'])
-    .map<[string, ILinterOptions]>(file => [file, linterOption(engineConfig)]);
+function listFiles(engineConfig: CodeClimateEngineConfig): rx.Observable<string> {
+  let matcher = new FileMatcher(CodeDirectoryBase, ['.ts']);
+  return engineConfig.include_paths ?
+    matcher.inclusionBasedFileListBuilder(engineConfig.include_paths) :
+    matcher.exclusionBasedFileListBuilder(engineConfig.exclude_paths || []);
 }
 
-function linterOption(engineConfig: CodeClimateEngineConfig): ILinterOptions {
+function buildLinterOption(engineConfig: CodeClimateEngineConfig): ILinterOptions {
   return {
     formatter: 'json',
     configuration: {
@@ -95,6 +46,13 @@ function linterOption(engineConfig: CodeClimateEngineConfig): ILinterOptions {
     formattersDirectory: 'customRules/',
     rulesDirectory: 'customFormatters/'
   }
+}
+
+function listFilesWithOptions(engineConfig: CodeClimateEngineConfig): rx.Observable<[string, ILinterOptions]> {
+  var observableString = listFiles(engineConfig);
+  let options = buildLinterOption(engineConfig);
+  return observableString
+    .map<[string, ILinterOptions]>(file => [file, options]);
 }
 
 function processFile(fileName: string, options: ILinterOptions): void {
@@ -110,6 +68,6 @@ function processFile(fileName: string, options: ILinterOptions): void {
 }
 
 loadConfig(ConfigFile)
-  .flatMap(filesAndOptions)
-  .subscribe(arg => processFile(arg[0], arg[1]))
+  .flatMap(listFilesWithOptions)
+  .subscribe((arg: [string, ILinterOptions]) => processFile(arg[0], arg[1]))
 ;
