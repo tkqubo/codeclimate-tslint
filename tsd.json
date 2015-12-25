@@ -66,7 +66,7 @@
       "commit": "6e1f597477707df47003d76664d90bb323ec5890"
     },
     "node/node.d.ts": {
-      "commit": "6e1f597477707df47003d76664d90bb323ec5890"
+      "commit": "1da639a106527e0c4010b354a1efe52a3059a291"
     },
     "lodash/lodash.d.ts": {
       "commit": "11322524f8db9cdb921427cad84cd22fe2d4f965"
@@ -85,6 +85,9 @@
     },
     "mocha/mocha.d.ts": {
       "commit": "11322524f8db9cdb921427cad84cd22fe2d4f965"
+    },
+    "proxyquire/proxyquire.d.ts": {
+      "commit": "1da639a106527e0c4010b354a1efe52a3059a291"
     }
   }
 }

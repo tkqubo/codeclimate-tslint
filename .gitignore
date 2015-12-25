@@ -2,3 +2,5 @@ bin
 src/*.js
 test/*.js
 node_modules
+coverage
+typings
