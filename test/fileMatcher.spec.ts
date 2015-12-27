@@ -29,13 +29,17 @@ describe('FileMatcher', () => {
       'index.js',
       'some.non-file.ts',
       'some.sym.ts',
+      'src',
+      'src/lib',
       'src/lib/util.ts',
       'src/lib/util.js',
+      'node_modules',
       'node_modules/util/util.ts',
       'node_modules/util/util.js',
       'node_modules/README.md'
     ],
     node_modules: [
+      'node_modules',
       'node_modules/util/util.ts',
       'node_modules/util/util.js',
       'node_modules/README.md'
@@ -46,6 +50,7 @@ describe('FileMatcher', () => {
       'some.sym.ts',
     ],
     'src/**/*': [
+      'src/lib',
       'src/lib/util.ts',
       'src/lib/util.js',
     ]
