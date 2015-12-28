@@ -24,7 +24,7 @@ export class FileMatcher {
 
   inclusionBasedFileListBuilder(includePaths: string[]): rx.Observable<string> {
     // lodash currently cannot chain `flatten()`
-    let expandedIncludePaths:string[] = _.flatten(includePaths.map(path => glob.sync(`${this.basePath}${path}`)));
+    let expandedIncludePaths: string[] = _.flatten(includePaths.map(path => glob.sync(`${this.basePath}${path}`)));
     // currently rxjs cannot use partition
     let [directories, files] = _.partition(expandedIncludePaths, file => fs.lstatSync(file).isDirectory());
 

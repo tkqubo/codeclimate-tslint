@@ -1,17 +1,16 @@
-FROM mhart/alpine-node
+FROM node
+
+MAINTAINER tkqubo
+
+RUN useradd -u 9000 -r -s /bin/false app
 
 WORKDIR /usr/src/app
-COPY package.json /usr/src/app/
-COPY tslint.json /usr/src/app/
-
-RUN apk --update add git
-
+COPY . /usr/src/app
 RUN npm install
 
-RUN adduser -u 9000 -D app
+VOLUME /code
+WORKDIR /code
 USER app
-
-COPY . /usr/src/app
 
 CMD ["node", "/usr/src/app/bin/index.js"]
 
