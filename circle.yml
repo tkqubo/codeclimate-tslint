@@ -6,8 +6,12 @@ machine:
     repository: tkqubo/codeclimate-tslint
 
 test:
-  override:
+  pre:
     - docker build -t=$repository:b$CIRCLE_BUILD_NUM .
+  override:
+    - npm test
+  post:
+    - npm run test:report
 
 deployment:
   registry:
@@ -26,3 +30,7 @@ deployment:
           }
           EOF
       - docker push $repository:b$CIRCLE_BUILD_NUM
+
+general:
+  artifacts:
+    - coverage
