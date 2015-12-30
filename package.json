@@ -1,6 +1,6 @@
 {
   "name": "codeclimate-tslint",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Code Climate TSLint-Engine for TypeScript",
   "main": "bin/index.js",
   "scripts": {
@@ -22,7 +22,10 @@
     "url": "git+https://github.com/tkqubo/codeclimate-tslint.git"
   },
   "keywords": [
-    "TypeScript", "tslint", "codeclimate", "Code Climate"
+    "TypeScript",
+    "tslint",
+    "codeclimate",
+    "Code Climate"
   ],
   "author": "tkqubo",
   "license": "MIT",
