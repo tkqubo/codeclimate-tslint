@@ -1,4 +1,4 @@
-bin
+dist
 src/*.js
 test/*.js
 node_modules

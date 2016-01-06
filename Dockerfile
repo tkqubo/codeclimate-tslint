@@ -14,5 +14,5 @@ VOLUME /code
 WORKDIR /code
 USER app
 
-CMD ["node", "/usr/src/app/bin/index.js"]
+CMD ["/usr/src/app/bin/analyze"]
 
