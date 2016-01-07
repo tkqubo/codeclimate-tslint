@@ -37,8 +37,8 @@ export class CodeClimateConverter {
 
   private convertToLineColumnPosition(position: RuleFailurePosition): CodeClimate.LineColumnPosition {
     return {
-      line: position.getLineAndCharacter().line,
-      column: position.getLineAndCharacter().character
+      line: position.getLineAndCharacter().line + 1,
+      column: position.getLineAndCharacter().character + 1
     };
   }
 }
