@@ -1,24 +1,12 @@
 ---
 engines:
-  duplication:
-    enabled: true
-    config:
-      languages:
-      - TypeScript
-  eslint:
-    enabled: true
   fixme:
     enabled: true
   tslint:
     enabled: true
 ratings:
   paths:
-  - "**.inc"
-  - "**.js"
-  - "**.jsx"
-  - "**.module"
-  - "**.php"
-  - "**.py"
-  - "**.rb"
+  - "**.ts"
 exclude_paths:
 - node_modules/**/*
+- test/**/*
