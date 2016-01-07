@@ -1,7 +1,5 @@
 ---
 engines:
-  fixme:
-    enabled: true
   tslint:
     enabled: true
 ratings:
