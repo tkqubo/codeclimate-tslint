@@ -27,9 +27,9 @@ describe('CodeClimateConverter', () => {
     let begin = location.positions.begin as CodeClimate.LineColumnPosition ;
     let end = location.positions.end as CodeClimate.LineColumnPosition ;
     assert(location.path === 'target-source-file.ts');
-    assert(begin.line === 2);
-    assert(begin.column === 30);
-    assert(end.line === 8);
-    assert(end.column === 24);
+    assert(begin.line === 3);
+    assert(begin.column === 31);
+    assert(end.line === 9);
+    assert(end.column === 25);
   });
 });
