@@ -12,12 +12,13 @@
     "docker": "npm run docker:build && npm run docker:run",
     "docker:build": "docker build --rm -t tkqubo/codeclimate-tslint .",
     "docker:run": "docker run -v $(pwd):/code -v $(pwd)/config.json:/config.json tkqubo/codeclimate-tslint",
-    "test": "npm run build && npm run istanbul",
+    "test": "npm run build && npm run istanbul && npm run test:report",
     "test:watch": "npm run build && npm run istanbul:watch",
     "test:mocha": "npm run build && npm run mocha",
-    "test:report": "codeclimate-test-reporter < coverage/lcov.info",
+    "test:report": "codeclimate-test-reporter < coverage/lcov.ts.info",
     "mocha": "mocha --compilers ts:espower-typescript/guess test/*.spec.ts",
-    "istanbul": "istanbul cover _mocha -- --compilers ts:espower-typescript/guess test/*.spec.ts",
+    "istanbul": "istanbul cover _mocha -- --compilers ts:espower-typescript/guess test/*.spec.ts && npm run istanbul:remap",
+    "istanbul:remap": "remap-istanbul -i coverage/coverage.json -o coverage/lcov.ts.info -t lcovonly",
     "istanbul:watch": "istanbul cover node_modules/.bin/_mocha -- --compilers ts:espower-typescript/guess test/*.spec.ts -w"
   },
   "repository": {
@@ -50,6 +51,7 @@
   },
   "dependencies": {
     "lodash": "^3.10.1",
+    "remap-istanbul": "^0.5.1",
     "rx": "^4.0.7",
     "tslint": "^3.2.1"
   }
