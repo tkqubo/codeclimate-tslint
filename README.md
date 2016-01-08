@@ -1,6 +1,7 @@
 # Code Climate TSLint-Engine
 
 [![CircleCI](https://img.shields.io/circleci/project/tkqubo/codeclimate-tslint.svg)](https://circleci.com/gh/tkqubo/codeclimate-tslint)
+[![Code Climate](https://codeclimate.com/github/tkqubo/codeclimate-tslint/badges/gpa.svg)](https://codeclimate.com/github/tkqubo/codeclimate-tslint)
 [![Code Climate](https://img.shields.io/codeclimate/coverage/github/tkqubo/codeclimate-tslint.svg)](https://codeclimate.com/github/tkqubo/codeclimate-tslint/coverage)
 ![David](https://david-dm.org/tkqubo/codeclimate-tslint.svg)
 [![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)
