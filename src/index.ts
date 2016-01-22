@@ -69,5 +69,11 @@ function processFile(fileName: string, options: ILinterOptions): void {
 
 loadConfig(ConfigFile)
   .flatMap(listFilesWithOptions)
-  .subscribe((arg: [string, ILinterOptions]) => processFile(arg[0], arg[1]))
+  .toArray()
+  .subscribe((args: [string, ILinterOptions][]) => {
+    args.forEach((arg: [string, ILinterOptions]) => processFile(arg[0], arg[1]));
+    if (args.length) {
+      process.exit(1);
+    }
+  })
 ;

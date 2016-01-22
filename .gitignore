@@ -4,5 +4,6 @@ src/*.js.map
 test/*.js
 test/*.js.map
 node_modules
+npm-debug.log
 coverage
 typings
