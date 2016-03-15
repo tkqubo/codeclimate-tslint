@@ -12,7 +12,7 @@ import {FileMatcher} from './fileMatcher';
 import * as CodeClimate from './codeclimateDefinitions';
 import {CodeClimateConverter} from './codeclimateConverter';
 
-const DefaultTsLintFile = './tslint.json';
+const DefaultTsLintFile = '/usr/src/app/tslint.json';
 const ConfigFile = '/config.json';
 const CodeDirectoryBase = '/code/';
 
@@ -22,11 +22,22 @@ interface CodeClimateEngineConfig {
   rules?: any;
 }
 
+const DefaultExcludePaths: string[] = [
+  'node_modules',
+  'typings'
+];
+
 function loadConfig(configFileName: string): rx.Observable<CodeClimateEngineConfig> {
   return rx.Observable
     .fromNodeCallback(fs.readFile)(configFileName)
     .catch((err: Error) => rx.Observable.return(null))
     .map<CodeClimateEngineConfig>((buffer: Buffer) => !!buffer ? JSON.parse(buffer.toString('utf-8')) : {})
+    .map<CodeClimateEngineConfig>((config: CodeClimateEngineConfig) => {
+      if (!config.include_paths && !config.exclude_paths) {
+        config.exclude_paths = DefaultExcludePaths;
+      }
+      return config;
+    })
   ;
 }
 
