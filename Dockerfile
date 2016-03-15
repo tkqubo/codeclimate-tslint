@@ -2,18 +2,18 @@ FROM node
 
 MAINTAINER tkqubo
 
-COPY . /usr/src/app
-WORKDIR /usr/src/app
-
-RUN useradd -u 9000 -r -s /bin/false app
+# engine.json
 COPY engine.json /
 
+RUN useradd -u 1000 -r -s /bin/false app
+
+COPY . /usr/src/app
+WORKDIR /usr/src/app
 RUN npm install
 RUN npm run build
-
 RUN chown -R app:app /usr/src/app
 
-WORKDIR /code
 USER app
+WORKDIR /code
 
 CMD ["/usr/src/app/bin/analyze"]
