@@ -8,12 +8,12 @@ export interface Issue {
   check_name: string;
   description: string;
   content?: Contents;
-  categories: string[];
+  categories: Category[];
   location: Location;
   other_locations?: Location[];
   trace?: Trace;
   remediation_points?: number;
-  severity?: string;
+  severity?: Severity;
   fingerprint?: string;
 }
 
@@ -55,20 +55,8 @@ export namespace IssueTypes {
   export const Issue = 'issue';
 }
 
-export namespace Categories {
-  export const BugRisk = 'Bug Risk';
-  export const Clarity = 'Clarity';
-  export const Compatibility = 'Compatibility';
-  export const Complexity = 'Complexity';
-  export const Duplication = 'Duplication';
-  export const Performance = 'Performance';
-  export const Security = 'Security';
-  export const Style = 'Style';
-}
+export type Category = 'Bug Risk'|'Clarity'|'Compatibility'|'Complexity'|'Duplication'|'Performance'|'Security'|'Style';
 
-export namespace Severities {
-  export const Info = 'info';
-  export const Normal = 'normal';
-  export const Critical = 'critical';
-}
+export type Severity = 'info'|'normal'|'critical';
+
 

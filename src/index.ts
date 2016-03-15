@@ -1,15 +1,9 @@
 'use strict';
 import * as fs from 'fs';
-import * as glob from 'glob';
-import * as _ from 'lodash';
 import * as rx from 'rx';
-import * as ts from 'typescript';
 import * as Linter from 'tslint';
 import {ILinterOptions} from 'tslint/lib/lint';
-import {RuleFailure} from 'tslint/lib/language/rule/rule';
 import {FileMatcher} from './fileMatcher';
-
-import * as CodeClimate from './codeclimateDefinitions';
 import {CodeClimateConverter} from './codeclimateConverter';
 
 const DefaultTsLintFile = '/usr/src/app/tslint.json';

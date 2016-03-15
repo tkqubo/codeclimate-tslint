@@ -1,7 +1,5 @@
 'use strict';
-import * as ts from "typescript";
-import {RuleFailure,RuleFailurePosition} from "tslint/lib/language/rule/rule";
-
+import {RuleFailure, RuleFailurePosition} from 'tslint/lib/language/rule/rule';
 import * as CodeClimate from './codeclimateDefinitions';
 
 export class CodeClimateConverter {
@@ -16,7 +14,7 @@ export class CodeClimateConverter {
       type: CodeClimate.IssueTypes.Issue,
       check_name: failure.getRuleName(),
       description: failure.getFailure(),
-      categories: [CodeClimate.Categories.Style], // currently only Style is available
+      categories: ['Style'], // currently only Style is available
       location: this.convertToLocation(failure)
     };
   }
