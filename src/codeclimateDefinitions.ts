@@ -3,6 +3,22 @@
 export type Location = LineLocation|PositionLocation;
 export type Position = LineColumnPosition|OffsetPosition;
 
+export function createIssueFromError(e: Error): Issue {
+  return {
+    type: IssueTypes.Issue,
+    check_name: '(runtime error)',
+    description: e.message,
+    categories: ['Bug Risk'],
+    location: {
+      path: '',
+      positions: {
+        begin: { line: 0, column: 0 },
+        end: { line: 0, column: 0 }
+      }
+    },
+  };
+}
+
 export interface Issue {
   type: string;
   check_name: string;

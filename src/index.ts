@@ -4,6 +4,7 @@ import * as rx from 'rx';
 import * as Linter from 'tslint';
 import {ILinterOptions} from 'tslint/lib/lint';
 import {FileMatcher} from './fileMatcher';
+import * as CodeClimate from './codeclimateDefinitions';
 import {CodeClimateConverter} from './codeclimateConverter';
 
 const DefaultTsLintFile = '/usr/src/app/tslint.json';
@@ -64,12 +65,17 @@ function processFile(fileName: string, options: ILinterOptions): void {
   let contents = fs.readFileSync(fileName, 'utf8');
   let linter = new Linter(fileName, contents, options);
   let converter = new CodeClimateConverter();
-  linter.lint().failures
-    .map(converter.convert)
-    .map(JSON.stringify)
-    .map(json => `${json}\u0000`)
-    .forEach(output => console.log(output))
-  ;
+  try {
+    linter.lint().failures
+      .map(converter.convert)
+      .map(JSON.stringify)
+      .map(json => `${json}\u0000`)
+      .forEach(output => console.log(output))
+    ;
+  } catch (e) {
+    let issue = CodeClimate.createIssueFromError(e);
+    console.log(JSON.stringify(issue) + '\u0000');
+  }
 }
 
 loadConfig(ConfigFile)
