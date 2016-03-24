@@ -4,7 +4,7 @@
   "description": "Code Climate TSLint-Engine for TypeScript",
   "main": "dist/index.js",
   "scripts": {
-    "install": "tsd --config tsd.json reinstall --overwrite",
+    "install": "typings install",
     "clean": "rm -rfv dist",
     "build": "npm run clean && tsc && npm run dist",
     "dist": "mkdir -pv dist && cp -v src/*.js dist/",

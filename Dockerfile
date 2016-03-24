@@ -9,6 +9,7 @@ RUN useradd -u 1000 -r -s /bin/false app
 
 COPY . /usr/src/app
 WORKDIR /usr/src/app
+RUN npm install -g typings
 RUN npm install
 RUN npm run build
 RUN chown -R app:app /usr/src/app
