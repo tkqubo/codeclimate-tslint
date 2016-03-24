@@ -23,8 +23,10 @@ const DefaultExcludePaths: string[] = [
 ];
 
 function loadConfig(configFileName: string): rx.Observable<CodeClimateEngineConfig> {
-  return rx.Observable
-    .fromNodeCallback(fs.readFile)(configFileName)
+  // FIXME: have no idea how to resolve `fromNodeCallback` with typings...
+  let fromNodeCallback: <TResult>(func: Function, context?: any, selector?: Function) => (...args: any[]) => rx.Observable<TResult> =
+    (rx.Observable as any).fromNodeCallback;
+  return fromNodeCallback(fs.readFile)(configFileName)
     .catch((err: Error) => rx.Observable.return(null))
     .map<CodeClimateEngineConfig>((buffer: Buffer) => !!buffer ? JSON.parse(buffer.toString('utf-8')) : {})
     .map<CodeClimateEngineConfig>((config: CodeClimateEngineConfig) => {

@@ -18,13 +18,13 @@ export class FileMatcher {
     // currently rxjs cannot use partition
     let [directories, files]: string[][] = _.partition(expandedExcludePaths, file => fs.lstatSync(file).isDirectory());
     let allExcludedFiles = _.chain(directories)
-      .map(directory => glob.sync(`${directory}/**/**`))
+      .map(directory => glob.sync(`${directory}**/**`))
       .map(this.prunePathsWithinSymlinks)
       .flattenDeep()
       .concat(files)
       .value()
       ;
-    var allFiles = glob.sync(`${this.basePath}/**/**`);
+    var allFiles = glob.sync(`${this.basePath}**/**`);
     return rx.Observable
       .fromArray(_.difference(allFiles, allExcludedFiles))
       .filter(this.isFile.bind(this))
