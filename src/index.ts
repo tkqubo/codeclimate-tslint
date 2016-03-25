@@ -22,24 +22,16 @@ const DefaultExcludePaths: string[] = [
   'typings'
 ];
 
-function loadConfig(configFileName: string): rx.Observable<CodeClimateEngineConfig> {
-  // FIXME: have no idea how to resolve `fromNodeCallback` with typings...
-  let fromNodeCallback: <TResult>(func: Function, context?: any, selector?: Function) => (...args: any[]) => rx.Observable<TResult> =
-    (rx.Observable as any).fromNodeCallback;
-  return fromNodeCallback(fs.readFile)(configFileName)
-    .catch((err: Error) => rx.Observable.return(null))
-    .map<CodeClimateEngineConfig>((buffer: Buffer) => !!buffer ? JSON.parse(buffer.toString('utf-8')) : {})
-    .map<CodeClimateEngineConfig>((config: CodeClimateEngineConfig) => {
-      if (!config.include_paths && !config.exclude_paths) {
-        config.exclude_paths = DefaultExcludePaths;
-      }
-      return config;
-    })
-  ;
+function loadConfig(configFileName: string): CodeClimateEngineConfig {
+  let config = JSON.parse(fs.readFileSync(configFileName).toString('utf-8'));
+  if (!config.include_paths && !config.exclude_paths) {
+    config.exclude_paths = DefaultExcludePaths;
+  }
+  return config;
 }
 
-function listFiles(engineConfig: CodeClimateEngineConfig): rx.Observable<string> {
-  let matcher = new FileMatcher(CodeDirectoryBase, ['.ts']);
+function listFiles(engineConfig: CodeClimateEngineConfig, codeDirectoryBase: string = CodeDirectoryBase): rx.Observable<string> {
+  let matcher = new FileMatcher(codeDirectoryBase, ['.ts']);
   return engineConfig.include_paths ?
     matcher.inclusionBasedFileListBuilder(engineConfig.include_paths) :
     matcher.exclusionBasedFileListBuilder(engineConfig.exclude_paths || []);
@@ -54,13 +46,6 @@ function buildLinterOption(engineConfig: CodeClimateEngineConfig): ILinterOption
     formattersDirectory: 'customRules/',
     rulesDirectory: 'customFormatters/'
   }
-}
-
-function listFilesWithOptions(engineConfig: CodeClimateEngineConfig): rx.Observable<[string, ILinterOptions]> {
-  let observableString = listFiles(engineConfig);
-  let options = buildLinterOption(engineConfig);
-  return observableString
-    .map<[string, ILinterOptions]>(file => [file, options]);
 }
 
 function processFile(fileName: string, options: ILinterOptions): void {
@@ -80,7 +65,9 @@ function processFile(fileName: string, options: ILinterOptions): void {
   }
 }
 
-loadConfig(ConfigFile)
-  .flatMap(listFilesWithOptions)
-  .subscribe((arg: [string, ILinterOptions]) => processFile(arg[0], arg[1]))
+let config: CodeClimateEngineConfig = loadConfig(ConfigFile);
+let linterOptions: ILinterOptions = buildLinterOption(config);
+listFiles(config, CodeDirectoryBase)
+  .map(file => processFile(file, linterOptions))
+  .subscribe()
 ;

@@ -6,7 +6,6 @@ import * as rx from 'rx';
 
 export class FileMatcher {
   constructor(public basePath: string, public extensions: string[]) {
-    // FIXME:
     this.prunePathsWithinSymlinks = this.prunePathsWithinSymlinks.bind(this);
     this.isFileWithMatchingExtension = this.isFileWithMatchingExtension.bind(this);
     this.isFile = this.isFile.bind(this);
