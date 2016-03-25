@@ -19,6 +19,12 @@ export function createIssueFromError(e: Error): Issue {
   };
 }
 
+export interface Config {
+  include_paths: string[];
+  enabled: boolean;
+  config?: string;
+}
+
 export interface Issue {
   type: string;
   check_name: string;
