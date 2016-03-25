@@ -57,7 +57,7 @@ function buildLinterOption(engineConfig: CodeClimateEngineConfig): ILinterOption
 }
 
 function listFilesWithOptions(engineConfig: CodeClimateEngineConfig): rx.Observable<[string, ILinterOptions]> {
-  var observableString = listFiles(engineConfig);
+  let observableString = listFiles(engineConfig);
   let options = buildLinterOption(engineConfig);
   return observableString
     .map<[string, ILinterOptions]>(file => [file, options]);
@@ -82,11 +82,5 @@ function processFile(fileName: string, options: ILinterOptions): void {
 
 loadConfig(ConfigFile)
   .flatMap(listFilesWithOptions)
-  .toArray()
-  .subscribe((args: [string, ILinterOptions][]) => {
-    args.forEach((arg: [string, ILinterOptions]) => processFile(arg[0], arg[1]));
-    if (args.length) {
-      process.exit(1);
-    }
-  })
+  .subscribe((arg: [string, ILinterOptions]) => processFile(arg[0], arg[1]))
 ;

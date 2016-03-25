@@ -1,4 +1,3 @@
----
 engines:
   tslint:
     enabled: true
@@ -7,4 +6,4 @@ ratings:
   - "**.ts"
 exclude_paths:
 - node_modules/**/*
-- test/**/*
+- typings/**/*
