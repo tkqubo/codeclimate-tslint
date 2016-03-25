@@ -26,8 +26,8 @@ export class FileMatcher {
     var allFiles = glob.sync(`${this.basePath}**/**`);
     return rx.Observable
       .fromArray(_.difference(allFiles, allExcludedFiles))
-      .filter(this.isFile.bind(this))
-      .filter(this.isFileWithMatchingExtension.bind(this))
+      .filter(this.isFile)
+      .filter(this.isFileWithMatchingExtension)
       ;
   }
 

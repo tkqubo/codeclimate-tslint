@@ -2,7 +2,7 @@
 import {RuleFailure, RuleFailurePosition} from 'tslint/lib/language/rule/rule';
 import * as CodeClimate from './codeclimateDefinitions';
 
-export class CodeClimateConverter {
+export class IssueConverter {
   constructor() {
     this.convert = this.convert.bind(this);
     this.convertToLocation = this.convertToLocation.bind(this);

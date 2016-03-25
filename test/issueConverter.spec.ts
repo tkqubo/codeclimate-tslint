@@ -2,15 +2,14 @@
 
 const assert = require('power-assert');
 import * as sinon from 'sinon';
-import * as ts from "typescript";
-import {RuleFailure,RuleFailurePosition} from "tslint/lib/language/rule/rule";
-
-import {CodeClimateConverter} from '../src/codeclimateConverter';
+import * as ts from 'typescript';
+import {RuleFailure} from 'tslint/lib/language/rule/rule';
+import {IssueConverter} from '../src/issueConverter';
 import * as CodeClimate from '../src/codeclimateDefinitions';
 
 describe('CodeClimateConverter', () => {
   it('.convert(failure: RuleFailure)', () => {
-    let converter = new CodeClimateConverter();
+    let converter = new IssueConverter();
     let sourceFile = sinon.mock({}) as any as ts.SourceFile;
     sourceFile.fileName = '/code/target-source-file.ts';
     sourceFile.getLineAndCharacterOfPosition = (pos: number) => pos === 1 ? { line: 2, character: 30 } : { line: 8, character: 24 };
