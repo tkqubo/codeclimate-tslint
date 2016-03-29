@@ -9,6 +9,8 @@ RUN useradd -u 9000 app
 
 COPY . /usr/src/app
 WORKDIR /usr/src/app
+RUN npm install -g typings
+RUN typings install
 RUN npm install
 RUN npm run build
 
