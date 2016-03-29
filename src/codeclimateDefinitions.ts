@@ -4,8 +4,8 @@ export type Location = LineLocation|PositionLocation;
 export type Position = LineColumnPosition|OffsetPosition;
 
 export interface Config {
-  include_paths: string[];
-  enabled: boolean;
+  include_paths?: string[];
+  enabled?: boolean;
   config?: string;
 }
 

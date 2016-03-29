@@ -34,7 +34,8 @@ export class TsLinter {
   }
 
   private loadConfig(): CodeClimateTslintEngineConfig {
-    let codeClimateConfig: CodeClimate.Config = JSON.parse(fs.readFileSync(TsLinter.ConfigFile).toString('utf-8'));
+    let codeClimateConfig: CodeClimate.Config = (fs.existsSync(TsLinter.ConfigFile) && fs.statSync(TsLinter.ConfigFile).isFile()) ?
+      JSON.parse(fs.readFileSync(TsLinter.ConfigFile).toString('utf-8')) : { enabled: true };
     let config: CodeClimateTslintEngineConfig = {};
 
     // resolve rules
