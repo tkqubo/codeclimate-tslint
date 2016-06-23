@@ -39,7 +39,7 @@
   "homepage": "https://github.com/tkqubo/codeclimate-tslint#readme",
   "devDependencies": {
     "codeclimate-test-reporter": "^0.3.3",
-    "espower-typescript": "^5.0.1",
+    "espower-typescript": "^4.1.0",
     "glob": "^7.0.5",
     "istanbul": "^0.4.4",
     "mocha": "^2.5.3",
