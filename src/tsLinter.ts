@@ -30,7 +30,7 @@ export class TsLinter {
     let config: CodeClimateTslintEngineConfig = this.loadConfig();
     let linterOptions: ILinterOptions = this.createLinterOptionFromConfig(config);
     return this.listFiles(config)
-      .flatMap((file: string) => this.doLint(file, linterOptions))
+      .flatMap<CodeClimate.Issue>((file: string) => this.doLint(file, linterOptions))
   }
 
   private loadConfig(): CodeClimateTslintEngineConfig {
