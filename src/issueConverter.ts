@@ -1,5 +1,6 @@
 'use strict';
-import {RuleFailure, RuleFailurePosition} from 'tslint/lib/language/rule/rule';
+
+import { RuleFailure, RuleFailurePosition } from 'tslint/lib/language/rule/rule';
 import * as CodeClimate from './codeclimateDefinitions';
 
 export class IssueConverter {
@@ -40,4 +41,3 @@ export class IssueConverter {
     };
   }
 }
-

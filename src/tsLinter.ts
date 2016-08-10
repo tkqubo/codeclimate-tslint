@@ -1,21 +1,25 @@
 'use strict';
+
 import * as fs from 'fs';
 import * as path from 'path';
 import * as _ from 'lodash';
 import * as rx from 'rx';
 import * as Linter from 'tslint';
 import * as CodeClimate from './codeclimateDefinitions';
-import {ILinterOptions} from 'tslint/lib/lint';
-import {FileMatcher} from './fileMatcher';
-import {IssueConverter} from './issueConverter';
+import { ILinterOptions } from 'tslint/lib/lint';
+import { FileMatcher } from './fileMatcher';
+import { IssueConverter } from './issueConverter';
 
 interface CodeClimateTslintEngineConfig {
+
   include_paths?: string[];
   exclude_paths?: string[];
   rules?: any;
+  
 }
 
 export class TsLinter {
+
   static DefaultTsLintFile = '/usr/src/app/tslint.json';
   static ConfigFile = '/config.json';
   static CodeDirectoryBase = '/code/';
@@ -29,8 +33,9 @@ export class TsLinter {
   lint(): rx.Observable<CodeClimate.Issue> {
     let config: CodeClimateTslintEngineConfig = this.loadConfig();
     let linterOptions: ILinterOptions = this.createLinterOptionFromConfig(config);
+
     return this.listFiles(config)
-      .flatMap<CodeClimate.Issue>((file: string) => this.doLint(file, linterOptions))
+      .flatMap<CodeClimate.Issue>((file: string) => this.doLint(file, linterOptions));
   }
 
   private loadConfig(): CodeClimateTslintEngineConfig {
@@ -79,8 +84,7 @@ export class TsLinter {
     return rx.Observable
       .fromArray(linter.lint().failures)
       .map(this.converter.convert)
-      .catch((e: any) => rx.Observable.just(this.createIssueFromError(e)))
-      ;
+      .catch((e: any) => rx.Observable.just(this.createIssueFromError(e)));
   }
 
   private createIssueFromError(e: Error): CodeClimate.Issue {
@@ -95,8 +99,7 @@ export class TsLinter {
           begin: { line: 0, column: 0 },
           end: { line: 0, column: 0 }
         }
-      },
+      }
     };
   }
 }
-

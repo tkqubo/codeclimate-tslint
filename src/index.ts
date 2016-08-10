@@ -1,10 +1,9 @@
 'use strict';
-import {TsLinter} from './tsLinter';
+
+import { TsLinter } from './tsLinter';
 
 new TsLinter()
   .lint()
-  .map(JSON.stringify)
+  .map((j) => { return JSON.stringify(j) })
   .map(json => `${json}\u0000`)
-  .subscribe(line => console.log(line))
-;
-
+  .subscribe(line => console.log(line));
