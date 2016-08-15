@@ -10,8 +10,8 @@ let fsMock: any = {
     isDirectory: () => file.indexOf('.') == -1
   })
 };
-import {FileMatcher as ActualFileMatcher} from '../src/fileMatcher';
-let fileMatcherModule = proxyquire('../src/fileMatcher', { glob: globMock, fs: fsMock });
+import {FileMatcher as ActualFileMatcher} from '../fileMatcher';
+let fileMatcherModule = proxyquire('../fileMatcher', { glob: globMock, fs: fsMock });
 let FileMatcher: typeof ActualFileMatcher = fileMatcherModule.FileMatcher;
 
 const BasePath = "/file-matcher-test/";
