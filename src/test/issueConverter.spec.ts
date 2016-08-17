@@ -4,8 +4,8 @@ const assert = require('power-assert');
 import * as sinon from 'sinon';
 import * as ts from 'typescript';
 import {RuleFailure} from 'tslint/lib/language/rule/rule';
-import {IssueConverter} from '../src/issueConverter';
-import * as CodeClimate from '../src/codeclimateDefinitions';
+import {IssueConverter} from '../issueConverter';
+import * as CodeClimate from '../codeclimateDefinitions';
 
 describe('CodeClimateConverter', () => {
   it('.convert(failure: RuleFailure)', () => {

@@ -21,14 +21,13 @@ export class FileMatcher {
       .map(this.prunePathsWithinSymlinks)
       .flattenDeep()
       .concat(files)
-      .value()
-      ;
-    var allFiles = glob.sync(`${this.basePath}**/**`);
+      .value();
+
+    let allFiles = glob.sync(`${this.basePath}**/**`);
     return rx.Observable
       .fromArray(_.difference(allFiles, allExcludedFiles))
       .filter(this.isFile)
-      .filter(this.isFileWithMatchingExtension)
-      ;
+      .filter(this.isFileWithMatchingExtension);
   }
 
   inclusionBasedFileListBuilder(includePaths: string[]): rx.Observable<string> {
@@ -42,8 +41,7 @@ export class FileMatcher {
       .map(directory => glob.sync(`${directory}/**/**`))
       .flatMap(this.prunePathsWithinSymlinks)
       .concat(rx.Observable.fromArray(files))
-      .filter(this.isFileWithMatchingExtension)
-      ;
+      .filter(this.isFileWithMatchingExtension);
   }
 
   private isFile(file: string): boolean {
@@ -64,5 +62,3 @@ export class FileMatcher {
     );
   }
 }
-
-
