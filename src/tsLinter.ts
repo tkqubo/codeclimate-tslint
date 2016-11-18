@@ -11,11 +11,10 @@ import { FileMatcher } from './fileMatcher';
 import { IssueConverter } from './issueConverter';
 
 interface CodeClimateTslintEngineConfig {
-
   include_paths?: string[];
   exclude_paths?: string[];
-  rules?: any;
-  
+  configuration?: any;
+
 }
 
 export class TsLinter {
@@ -48,7 +47,8 @@ export class TsLinter {
       path.join(TsLinter.CodeDirectoryBase, codeClimateConfig.config || 'tslint.json'),
       TsLinter.DefaultTsLintFile
     ], file => fs.existsSync(file));
-    config.rules = JSON.parse(fs.readFileSync(tslintFileName).toString('utf-8')).rules;
+    console.error("TSLint is running with the " + tslintFileName + " configuration.");
+    config.configuration = Linter.loadConfigurationFromPath(tslintFileName);
 
     // resolve paths setting
     if (codeClimateConfig.include_paths) {
@@ -63,16 +63,14 @@ export class TsLinter {
   private createLinterOptionFromConfig(config: CodeClimateTslintEngineConfig): ILinterOptions {
     return {
       formatter: 'json',
-      configuration: {
-        rules: config.rules
-      },
-      formattersDirectory: 'customRules/',
-      rulesDirectory: 'customFormatters/'
+      configuration: config.configuration,
+      formattersDirectory: 'customFormatters/',
+      rulesDirectory: []
     }
   }
 
   private listFiles(config: CodeClimateTslintEngineConfig): rx.Observable<string> {
-    let matcher = new FileMatcher(TsLinter.CodeDirectoryBase, ['.ts']);
+    let matcher = new FileMatcher(TsLinter.CodeDirectoryBase, ['.ts', '.tsx']);
     return config.include_paths ?
       matcher.inclusionBasedFileListBuilder(config.include_paths) :
       matcher.exclusionBasedFileListBuilder(config.exclude_paths || []);
