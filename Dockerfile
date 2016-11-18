@@ -1,11 +1,11 @@
-FROM node
+FROM mhart/alpine-node:6
 
 MAINTAINER tkqubo
 
 # engine.json
 COPY engine.json /
 
-RUN useradd -u 9000 -r -s /bin/false app
+RUN adduser -u 9000 -D app
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
