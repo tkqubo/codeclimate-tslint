@@ -16,6 +16,7 @@ export class IssueConverter {
       check_name: failure.getRuleName(),
       description: failure.getFailure(),
       categories: ['Style'], // currently only Style is available
+      remediation_points: 50000, // all style issues are 50k
       location: this.convertToLocation(failure)
     };
   }

@@ -91,6 +91,7 @@ export class TsLinter {
       check_name: '(runtime error)',
       description: e.message,
       categories: ['Bug Risk'],
+      remediation_points: 50000,
       location: {
         path: '',
         positions: {

@@ -18,7 +18,7 @@ export interface Issue {
   location: Location;
   other_locations?: Location[];
   trace?: Trace;
-  remediation_points?: number;
+  remediation_points: number;
   severity?: Severity;
   fingerprint?: string;
 }
