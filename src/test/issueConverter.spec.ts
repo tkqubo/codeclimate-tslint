@@ -22,9 +22,9 @@ describe('CodeClimateConverter', () => {
     assert(actual.categories[0] === 'Style');
     assert(actual.check_name === 'style.failure');
     assert(actual.description === 'Style failed');
-    let location = actual.location as CodeClimate.PositionLocation;
-    let begin = location.positions.begin as CodeClimate.LineColumnPosition ;
-    let end = location.positions.end as CodeClimate.LineColumnPosition ;
+    let location = actual.location as CodeClimate.IPositionLocation;
+    let begin = location.positions.begin as CodeClimate.ILineColumnPosition ;
+    let end = location.positions.end as CodeClimate.ILineColumnPosition ;
     assert(location.path === 'target-source-file.ts');
     assert(begin.line === 3);
     assert(begin.column === 31);

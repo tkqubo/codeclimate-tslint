@@ -29,17 +29,21 @@ export class TsLinter {
 
   converter: IssueConverter = new IssueConverter();
 
-  lint(): rx.Observable<CodeClimate.Issue> {
+  lint(): rx.Observable<CodeClimate.IIssue> {
     let config: CodeClimateTslintEngineConfig = this.loadConfig();
     let linterOptions: ILinterOptions = this.createLinterOptionFromConfig(config);
 
     return this.listFiles(config)
-      .flatMap<CodeClimate.Issue>((file: string) => this.doLint(file, linterOptions));
+      .flatMap<CodeClimate.IIssue>((file: string) => this.doLint(file, linterOptions));
   }
 
   private loadConfig(): CodeClimateTslintEngineConfig {
-    let codeClimateConfig: CodeClimate.Config = (fs.existsSync(TsLinter.ConfigFile) && fs.statSync(TsLinter.ConfigFile).isFile()) ?
-      JSON.parse(fs.readFileSync(TsLinter.ConfigFile).toString('utf-8')) : { enabled: true };
+    let codeClimateConfig: CodeClimate.IConfig = (
+        fs.existsSync(TsLinter.ConfigFile) &&
+        fs.statSync(TsLinter.ConfigFile).isFile()
+      ) ?
+      JSON.parse(fs.readFileSync(TsLinter.ConfigFile).toString('utf-8')) :
+      { enabled: true };
     let config: CodeClimateTslintEngineConfig = {};
 
     // resolve rules
@@ -76,7 +80,7 @@ export class TsLinter {
       matcher.exclusionBasedFileListBuilder(config.exclude_paths || []);
   }
 
-  private doLint(fileName: string, options: ILinterOptions): rx.Observable<CodeClimate.Issue> {
+  private doLint(fileName: string, options: ILinterOptions): rx.Observable<CodeClimate.IIssue> {
     let contents = fs.readFileSync(fileName, 'utf8');
     let linter = new Linter(fileName, contents, options);
     return rx.Observable
@@ -85,7 +89,7 @@ export class TsLinter {
       .catch((e: any) => rx.Observable.just(this.createIssueFromError(e)));
   }
 
-  private createIssueFromError(e: Error): CodeClimate.Issue {
+  private createIssueFromError(e: Error): CodeClimate.IIssue {
     return {
       type: CodeClimate.IssueTypes.Issue,
       check_name: '(runtime error)',

@@ -3,13 +3,13 @@
 export type Location = LineLocation|PositionLocation;
 export type Position = LineColumnPosition|OffsetPosition;
 
-export interface Config {
+export interface IConfig {
   include_paths?: string[];
   enabled?: boolean;
   config?: string;
 }
 
-export interface Issue {
+export interface IIssue {
   type: string;
   check_name: string;
   description: string;
@@ -23,11 +23,11 @@ export interface Issue {
   fingerprint?: string;
 }
 
-export interface Contents {
+export interface IContents {
   body: string;
 }
 
-export interface LineLocation {
+export interface ILineLocation {
   path: string;
   lines: {
     begin: number;
@@ -35,7 +35,7 @@ export interface LineLocation {
   }
 }
 
-export interface PositionLocation {
+export interface IPositionLocation {
   path: string;
   positions: {
     begin: Position;
@@ -43,16 +43,16 @@ export interface PositionLocation {
   }
 }
 
-export interface LineColumnPosition {
+export interface ILineColumnPosition {
   line: number;
   column: number;
 }
 
-export interface OffsetPosition {
+export interface IOffsetPosition {
   offset: number;
 }
 
-export interface Trace {
+export interface ITrace {
   locations: Location[];
   stacktrace?: boolean;
 }
@@ -64,5 +64,3 @@ export namespace IssueTypes {
 export type Category = 'Bug Risk'|'Clarity'|'Compatibility'|'Complexity'|'Duplication'|'Performance'|'Security'|'Style';
 
 export type Severity = 'info'|'normal'|'critical';
-
-
