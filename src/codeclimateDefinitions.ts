@@ -1,7 +1,7 @@
 'use strict';
 
-export type Location = LineLocation|PositionLocation;
-export type Position = LineColumnPosition|OffsetPosition;
+export type Location = ILineLocation|IPositionLocation;
+export type Position = ILineColumnPosition|IOffsetPosition;
 
 export interface IConfig {
   include_paths?: string[];
@@ -13,11 +13,11 @@ export interface IIssue {
   type: string;
   check_name: string;
   description: string;
-  content?: Contents;
+  content?: IContents;
   categories: Category[];
   location: Location;
   other_locations?: Location[];
-  trace?: Trace;
+  trace?: ITrace;
   remediation_points: number;
   severity?: Severity;
   fingerprint?: string;
@@ -32,7 +32,7 @@ export interface ILineLocation {
   lines: {
     begin: number;
     end: number;
-  }
+  };
 }
 
 export interface IPositionLocation {
@@ -40,7 +40,7 @@ export interface IPositionLocation {
   positions: {
     begin: Position;
     end: Position;
-  }
+  };
 }
 
 export interface ILineColumnPosition {
@@ -57,9 +57,9 @@ export interface ITrace {
   stacktrace?: boolean;
 }
 
-export namespace IssueTypes {
-  export const Issue = 'issue';
-}
+export const issueTypes = {
+  Issue: 'issue'
+};
 
 export type Category = 'Bug Risk'|'Clarity'|'Compatibility'|'Complexity'|'Duplication'|'Performance'|'Security'|'Style';
 

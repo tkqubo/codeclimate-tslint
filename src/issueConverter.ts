@@ -12,7 +12,7 @@ export class IssueConverter {
 
   convert(failure: RuleFailure): CodeClimate.IIssue {
     return {
-      type: CodeClimate.IssueTypes.Issue,
+      type: CodeClimate.issueTypes.Issue,
       check_name: failure.getRuleName(),
       description: failure.getFailure(),
       categories: ['Style'], // currently only Style is available
