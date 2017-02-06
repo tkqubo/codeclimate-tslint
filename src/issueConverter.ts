@@ -10,12 +10,13 @@ export class IssueConverter {
     this.convertToLineColumnPosition = this.convertToLineColumnPosition.bind(this);
   }
 
-  convert(failure: RuleFailure): CodeClimate.Issue {
+  convert(failure: RuleFailure): CodeClimate.IIssue {
     return {
       type: CodeClimate.IssueTypes.Issue,
       check_name: failure.getRuleName(),
       description: failure.getFailure(),
       categories: ['Style'], // currently only Style is available
+      remediation_points: 50000, // all style issues are 50k
       location: this.convertToLocation(failure)
     };
   }
@@ -34,7 +35,7 @@ export class IssueConverter {
     return failure.getFileName().match(/\/code\/(.*)/i).pop();
   };
 
-  private convertToLineColumnPosition(position: RuleFailurePosition): CodeClimate.LineColumnPosition {
+  private convertToLineColumnPosition(position: RuleFailurePosition): CodeClimate.ILineColumnPosition {
     return {
       line: position.getLineAndCharacter().line + 1,
       column: position.getLineAndCharacter().character + 1
