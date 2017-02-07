@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as _ from 'lodash';
 import * as rx from 'rx';
-import * as Linter from 'tslint';
+import { Linter, Configuration } from 'tslint';
 import * as CodeClimate from './codeclimateDefinitions';
 import { ILinterOptions } from 'tslint/lib';
 import { FileMatcher } from './fileMatcher';
@@ -75,7 +75,7 @@ export class TsLinter {
 
   private doLint(fileName: string, options: ILinterOptions): rx.Observable<CodeClimate.IIssue> {
     const contents = fs.readFileSync(fileName, 'utf8');
-    const linter = new Linter.Linter(options);
+    const linter = new Linter(options);
 
     // resolve rules
     const codeClimateConfig: CodeClimate.IConfig = (
@@ -88,10 +88,10 @@ export class TsLinter {
       path.join(TsLinter.codeDirectoryBase, codeClimateConfig.config || 'tslint.json'),
       TsLinter.defaultTsLintFile
     ], (file) => fs.existsSync(file));
-    // console.error('TSLint is running with the ' + tslintFileName + ' configuration.');
-    // config.configuration = Linter.Configuration.loadConfigurationFromPath(tslintFileName);
 
-    linter.lint(fileName, contents, tslintFileName);
+    const configLoad = Configuration.findConfiguration(tslintFileName, fileName);
+
+    linter.lint(fileName, contents, configLoad.results);
     return rx.Observable
       .fromArray(linter.getResult().failures)
       .map(this.converter.convert)
