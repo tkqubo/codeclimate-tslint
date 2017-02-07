@@ -60,6 +60,6 @@
   "dependencies": {
     "lodash": "^4.13.1",
     "rx": "^4.1.0",
-    "tslint": "^3.14.0"
+    "tslint": "^4.4.2"
   }
 }

@@ -11,6 +11,7 @@
     "eofline": true,
     "jsdoc-format": true,
     "member-access": false,
+    "no-console": false,
     "whitespace": [true,
       "check-decl",
       "check-operator",
