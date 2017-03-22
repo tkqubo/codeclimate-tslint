@@ -25,7 +25,28 @@ export class IssueConverter {
   }
 
   private contentBody(name): string {
-    return `For more information see [this page](https://palantir.github.io/tslint/rules/${name}).`;
+    const rules = require('../lib/docs/rules');
+    const rule = rules.find((el) => el.ruleName === name);
+    const examplesString = rule.optionExamples.reduce((agg, ex) => {
+      return agg + '\n' + '```' + ex + '```';
+    }, '');
+    const schemaString = rule.options != null ? `
+      ## Schema
+      ${'```' + JSON.stringify(rule.options, null, 2) + '```'}
+    ` : '';
+    ;
+    return `
+    # Rule: ${name}
+    ## Config
+    ${rule.optionsDescription}
+
+    ## Examples
+    ${examplesString}
+
+    ${schemaString}
+
+    For more information see [this page](https://palantir.github.io/tslint/rules/${name}).
+    `;
   }
 
   private convertToLocation(failure: RuleFailure): CodeClimate.Location {
