@@ -26,7 +26,7 @@ export class IssueConverter {
 
   private contentBody(name: string): string {
     const rule = this.rules.find((el) =>  el.ruleName === name);
-    const examplesString = rule.optionExamples.reduce((agg: string, ex: string) => {
+    const examplesString = (rule.optionExamples || []).reduce((agg: string, ex: string) => {
       return agg + '\n' + '```' + ex + '```';
     }, '');
     const schemaString = rule.options != null ? `
