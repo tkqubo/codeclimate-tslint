@@ -1,38 +1,28 @@
 FROM mhart/alpine-node:6
+LABEL maintainer "Kyle Holzinger <kylelholzinger@gmail.com>"
 
-MAINTAINER kyleholzinger
-
-# engine.json
-COPY engine.json /
-
-RUN adduser -u 9000 -D app
-
-RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-COPY package.json /usr/src/app/
-RUN npm install
-
 COPY . /usr/src/app
-RUN npm install
-RUN npm install -g yarn
-RUN npm run build
-RUN apk --update add git jq
-RUN version="$(npm -j ls tslint | jq -r .dependencies.tslint.version)" && \
-  printf "Pulling docs from TSLint %s\n" "$version" && \
-  git clone --quiet --branch "$version" https://github.com/palantir/tslint.git && \
-  cd tslint && \
-  yarn install && \
-  yarn compile && \
-  yarn run docs && \
-  cd .. && \
-  mkdir -p ./lib/docs && \
-  cp --recursive tslint/docs/_data/rules.json ./lib/docs/rules.json && \
-  rm -rf tslint
-RUN apk del git jq
+COPY bin/docs ./bin/
+COPY engine.json package.json ./
 
-WORKDIR /code
+RUN npm install --global yarn
+RUN apk --update add git jq && \
+  npm install && \
+  version="$(npm -j ls tslint | jq -r .dependencies.tslint.version)" && \
+  bin/docs "$version" && \
+  cat engine.json | jq ".version = \"$version\"" > /tmp/engine.json && \
+  apk del --purge git jq
+RUN adduser -u 9000 -D app
+COPY . /usr/src/app
+RUN chown -R app:app ./ && \
+  mv /tmp/engine.json ./
+RUN npm run build
+
 USER app
+
 VOLUME /code
+WORKDIR /code
 
 CMD ["/usr/src/app/bin/analyze"]

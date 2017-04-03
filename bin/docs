@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -e
+
+version=$1
+printf "Pulling docs from TSLint %s\n" "$version"
+
+git clone --quiet --branch "$version" https://github.com/palantir/tslint.git /tmp/tslint
+
+cd /tmp/tslint
+yarn install
+yarn run compile:core
+yarn run compile:scripts
+yarn run docs
+cd -
+
+mkdir -p ./docs
+cp /tmp/tslint/docs/_data/rules.json ./docs/rules.json
+rm -r /tmp/tslint

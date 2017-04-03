@@ -2,7 +2,7 @@
 
 import { RuleFailure, RuleFailurePosition } from 'tslint/lib/language/rule/rule';
 import * as CodeClimate from './codeclimateDefinitions';
-const rules = require('../lib/docs/rules');
+const rules = require('../docs/rules');
 
 export class IssueConverter {
   constructor() {
@@ -26,7 +26,6 @@ export class IssueConverter {
   }
 
   private contentBody(name): string {
-    const rules = require('../lib/docs/rules');
     const rule = rules.find((el) => el.ruleName === name);
     const examplesString = rule.optionExamples.reduce((agg, ex) => {
       return agg + '\n' + '```' + ex + '```';
