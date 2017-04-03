@@ -4,21 +4,19 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as _ from 'lodash';
 import * as rx from 'rx';
-import { Linter, Configuration } from 'tslint';
+import { Linter, Configuration, IRuleMetadata, ILinterOptions } from 'tslint';
 import * as CodeClimate from './codeclimateDefinitions';
-import { ILinterOptions } from 'tslint/lib';
 import { FileMatcher } from './fileMatcher';
 import { IssueConverter } from './issueConverter';
+const rules: IRuleMetadata[] = require('../docs/rules');
 
 interface ICodeClimateTslintEngineConfig {
   include_paths?: string[];
   exclude_paths?: string[];
   configuration?: any;
-
 }
 
 export class TsLinter {
-
   static defaultTsLintFile = '/usr/src/app/tslint.json';
   static configFile = '/config.json';
   static codeDirectoryBase = '/code/';
@@ -27,7 +25,7 @@ export class TsLinter {
     'typings'
   ];
 
-  converter: IssueConverter = new IssueConverter();
+  converter: IssueConverter = new IssueConverter(rules);
 
   lint(): rx.Observable<CodeClimate.IIssue> {
     const config: ICodeClimateTslintEngineConfig = this.loadConfig();

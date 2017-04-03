@@ -1,11 +1,10 @@
 'use strict';
 
-import { RuleFailure, RuleFailurePosition } from 'tslint/lib/language/rule/rule';
+import { RuleFailure, RuleFailurePosition, IRuleMetadata } from 'tslint';
 import * as CodeClimate from './codeclimateDefinitions';
-const rules = require('../docs/rules');
 
 export class IssueConverter {
-  constructor() {
+  constructor(private rules: IRuleMetadata[]) {
     this.convert = this.convert.bind(this);
     this.convertToLocation = this.convertToLocation.bind(this);
     this.convertToLineColumnPosition = this.convertToLineColumnPosition.bind(this);
@@ -25,16 +24,16 @@ export class IssueConverter {
     };
   }
 
-  private contentBody(name): string {
-    const rule = rules.find((el) => el.ruleName === name);
-    const examplesString = rule.optionExamples.reduce((agg, ex) => {
+  private contentBody(name: string): string {
+    const rule = this.rules.find((el) =>  el.ruleName === name);
+    const examplesString = rule.optionExamples.reduce((agg: string, ex: string) => {
       return agg + '\n' + '```' + ex + '```';
     }, '');
     const schemaString = rule.options != null ? `
       ## Schema
       ${'```' + JSON.stringify(rule.options, null, 2) + '```'}
     ` : '';
-    ;
+
     return `
     # Rule: ${name}
     ## Config
