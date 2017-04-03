@@ -2,6 +2,7 @@
 
 import { RuleFailure, RuleFailurePosition } from 'tslint/lib/language/rule/rule';
 import * as CodeClimate from './codeclimateDefinitions';
+const rules = require('../lib/docs/rules');
 
 export class IssueConverter {
   constructor() {

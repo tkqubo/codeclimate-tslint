@@ -15,15 +15,16 @@ RUN npm install
 
 COPY . /usr/src/app
 RUN npm install
+RUN npm install -g yarn
 RUN npm run build
 RUN apk --update add git jq
 RUN version="$(npm -j ls tslint | jq -r .dependencies.tslint.version)" && \
   printf "Pulling docs from TSLint %s\n" "$version" && \
   git clone --quiet --branch "$version" https://github.com/palantir/tslint.git && \
   cd tslint && \
-  npm install && \
-  npm run compile && \
-  npm run docs && \
+  yarn install && \
+  yarn compile && \
+  yarn run docs && \
   cd .. && \
   mkdir -p ./lib/docs && \
   cp --recursive tslint/docs/_data/rules.json ./lib/docs/rules.json && \
