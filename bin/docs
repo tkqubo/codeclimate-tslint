@@ -8,7 +8,6 @@ printf "Pulling docs from TSLint %s\n" "$version"
 git clone --quiet --branch "$version" https://github.com/palantir/tslint.git /tmp/tslint
 
 cd /tmp/tslint
-rm yarn.lock
 yarn install
 yarn run compile:core
 yarn run compile:scripts
