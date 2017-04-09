@@ -3,7 +3,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as _ from 'lodash';
-import * as rx from 'rx';
+import * as rx from 'rxjs';
 import {Configuration, ILinterOptions, IRuleMetadata, Linter} from 'tslint';
 import {IConfigurationLoadResult} from 'tslint/lib/configuration';
 import * as CodeClimate from './codeclimateDefinitions';
@@ -36,8 +36,8 @@ export class TsLinter {
   }
 
   lint(): rx.Observable<CodeClimate.IIssue> {
-    return rx.Observable.fromArray(this.listFiles())
-      .flatMap<CodeClimate.IIssue>(this.doLint);
+    return rx.Observable.from(this.listFiles())
+      .flatMap(this.doLint);
   }
 
   listFiles(): string[] {
@@ -59,9 +59,9 @@ export class TsLinter {
     linter.lint(fileName, contents, configLoad.results);
 
     return rx.Observable
-      .fromArray(linter.getResult().failures)
+      .from(linter.getResult().failures)
       .map(this.issueConverter.convert)
-      .catch((e: any) => rx.Observable.just(this.createIssueFromError(e)))
+      .catch((e: any) => rx.Observable.of(this.createIssueFromError(e)))
       ;
   }
 
