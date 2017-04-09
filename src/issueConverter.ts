@@ -2,12 +2,14 @@
 
 import { RuleFailure, RuleFailurePosition, IRuleMetadata } from 'tslint';
 import * as CodeClimate from './codeclimateDefinitions';
+import autobind = require('autobind-decorator');
 
+@autobind
 export class IssueConverter {
-  constructor(private rules: IRuleMetadata[]) {
-    this.convert = this.convert.bind(this);
-    this.convertToLocation = this.convertToLocation.bind(this);
-    this.convertToLineColumnPosition = this.convertToLineColumnPosition.bind(this);
+  readonly filePattern: RegExp;
+
+  constructor(basePath: string, private rules: IRuleMetadata[]) {
+    this.filePattern = new RegExp(`${basePath}(.*)`, 'i');
   }
 
   convert(failure: RuleFailure): CodeClimate.IIssue {
@@ -59,8 +61,8 @@ export class IssueConverter {
   }
 
   private getFilePath(failure: RuleFailure): string {
-    return failure.getFileName().match(/\/code\/(.*)/i).pop();
-  };
+    return this.filePattern.exec(failure.getFileName()).pop();
+  }
 
   private convertToLineColumnPosition(position: RuleFailurePosition): CodeClimate.ILineColumnPosition {
     return {

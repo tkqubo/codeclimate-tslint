@@ -23,7 +23,7 @@ describe('IssueConverter', () => {
         'foo', 'bar'
       ]
     };
-    const converter = new IssueConverter([ruleMetadata]);
+    const converter = new IssueConverter('/code/', [ruleMetadata]);
     const sourceFile = sinon.mock({}) as any as ts.SourceFile;
     const sourcePath = 'path/target-source-file.ts';
     sourceFile.fileName = `/code/${sourcePath}`;

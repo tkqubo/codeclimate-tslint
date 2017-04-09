@@ -2,52 +2,22 @@
 import * as fs from 'fs';
 import * as glob from 'glob';
 import * as _ from 'lodash';
-import * as rx from 'rx';
+import autobind = require('autobind-decorator');
 
+@autobind
 export class FileMatcher {
-  constructor(public basePath: string, public extensions: string[]) {
-    this.prunePathsWithinSymlinks = this.prunePathsWithinSymlinks.bind(this);
-    this.isFileWithMatchingExtension = this.isFileWithMatchingExtension.bind(this);
-    this.isFile = this.isFile.bind(this);
-  }
+  constructor(public basePath: string, public extensions: string[]) { }
 
-  exclusionBasedFileListBuilder(excludePaths: string[]): rx.Observable<string> {
-    // lodash currently cannot chain `flatten()`
-    const expandedExcludePaths: string[] = _.flatten(excludePaths.map((path) => glob.sync(`${this.basePath}${path}`)));
-    // currently rxjs cannot use partition
-    const [directories, files]: string[][] = _.partition(
-      expandedExcludePaths, (file) => fs.lstatSync(file).isDirectory()
-      );
-    const allExcludedFiles = _.chain(directories)
-      .map((directory) => glob.sync(`${directory}**/**`))
-      .map(this.prunePathsWithinSymlinks)
-      .flattenDeep()
-      .concat(files)
-      .value();
-
-    const allFiles = glob.sync(`${this.basePath}**/**`);
-    return rx.Observable
-      .fromArray(_.difference(allFiles, allExcludedFiles))
-      .filter(this.isFile)
-      .filter(this.isFileWithMatchingExtension);
-  }
-
-  inclusionBasedFileListBuilder(includePaths: string[]): rx.Observable<string> {
-    // lodash currently cannot chain `flatten()`
+  matchFiles(includePaths: string[]): string[] {
     const expandedIncludePaths: string[] = _.flatten(includePaths.map((path) => glob.sync(`${this.basePath}${path}`)));
-    // currently rxjs cannot use partition
-    const [directories, files] = _.partition(expandedIncludePaths, (file) => fs.lstatSync(file).isDirectory());
+    const [directories, files]: string[][] = _.partition(expandedIncludePaths, (file) => fs.lstatSync(file).isDirectory());
 
-    return rx.Observable
-      .fromArray(directories)
+    return _.chain(directories)
       .map((directory) => glob.sync(`${directory}/**/**`))
       .flatMap(this.prunePathsWithinSymlinks)
-      .concat(rx.Observable.fromArray(files))
-      .filter(this.isFileWithMatchingExtension);
-  }
-
-  private isFile(file: string): boolean {
-    return fs.lstatSync(file).isFile();
+      .concat(files)
+      .filter(this.isFileWithMatchingExtension)
+      .value();
   }
 
   private prunePathsWithinSymlinks(paths: string[]): string[] {
@@ -59,8 +29,9 @@ export class FileMatcher {
     const stats = fs.lstatSync(file);
     const extension = '.' + file.split('.').pop();
     return (
-      stats.isFile() && !stats.isSymbolicLink()
-      && this.extensions.indexOf(extension) >= 0
+      stats.isFile() &&
+      !stats.isSymbolicLink() &&
+      this.extensions.indexOf(extension) >= 0
     );
   }
 }

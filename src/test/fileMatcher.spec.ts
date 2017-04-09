@@ -57,93 +57,23 @@ describe('FileMatcher', () => {
   });
   const fileMatcher = new FileMatcher(basePath, ['.ts']);
 
-  describe('.exclusionBasedFileListBuilder(excludePaths: string[])', () => {
-    it('passes with constant path pattern', (done) => {
-      const expected = [
-        'index.ts',
-        'src/lib/util.ts'
-      ];
-      const actual: string[] = [];
-      fileMatcher
-        .exclusionBasedFileListBuilder(['node_modules'])
-        .subscribe((next) => {
-          actual.push(next);
-        }, (error) => {
-          assert.fail(error);
-        }, () => {
-          assert(actual.length === expected.length);
-          actual.forEach((file, i) => {
-            assert(actual[i] === `${basePath}${expected[i]}`);
-          });
-          done();
-        })
-      ;
-    });
-
-    it('passes with empty list', (done) => {
-      const actual: string[] = [];
-      const expected = [
-        'index.ts',
-        'src/lib/util.ts',
-        'node_modules/util/util.ts'
-      ];
-      fileMatcher
-        .exclusionBasedFileListBuilder([])
-        .subscribe((next) => {
-          actual.push(next);
-        }, (error) => {
-          assert.fail(error);
-        }, () => {
-          assert(actual.length === expected.length);
-          actual.forEach((file, i) => {
-            assert(actual[i] === `${basePath}${expected[i]}`);
-          });
-          done();
-        })
-      ;
-    });
-  });
-
-  describe('.inclusionBasedFileListBuilder(includePaths: string[])', () => {
+  describe('.matchFiles(includePaths: string[])', () => {
     it('passes', (done) => {
+      // Given
       const expected = [
-        'index.ts',
-        'src/lib/util.ts'
+        `${basePath}index.ts`,
+        `${basePath}src/lib/util.ts`
       ];
-      const actual: string[] = [];
-      fileMatcher
-        .inclusionBasedFileListBuilder(['*.ts', 'src/**/*'])
-        .subscribe((next) => {
-          actual.push(next);
-        }, (error) => {
-          assert.fail(error);
-        }, () => {
-          assert(actual.length === expected.length);
-          actual.forEach((file, i) => {
-            assert(actual[i] === `${basePath}${expected[i]}`);
-          });
-          done();
-        })
-      ;
+      // When
+      let actual = fileMatcher.matchFiles(['*.ts', 'src/**/*']);
+      // Then
+      assert.deepStrictEqual(actual, expected);
+      done();
     });
 
     it('passes with empty list', (done) => {
-      const expected: string[] = [];
-      const actual: string[] = [];
-      fileMatcher
-        .inclusionBasedFileListBuilder([])
-        .subscribe((next) => {
-          actual.push(next);
-        }, (error) => {
-          assert.fail(error);
-        }, () => {
-          assert(actual.length === expected.length);
-          actual.forEach((file, i) => {
-            assert(actual[i] === `${basePath}${expected[i]}`);
-          });
-          done();
-        })
-      ;
+      assert.deepStrictEqual(fileMatcher.matchFiles([]), []);
+      done();
     });
   });
 });

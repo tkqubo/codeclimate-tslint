@@ -4,96 +4,69 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as _ from 'lodash';
 import * as rx from 'rx';
-import { Linter, Configuration, IRuleMetadata, ILinterOptions } from 'tslint';
+import {Configuration, ILinterOptions, IRuleMetadata, Linter} from 'tslint';
+import {IConfigurationLoadResult} from 'tslint/lib/configuration';
 import * as CodeClimate from './codeclimateDefinitions';
-import { FileMatcher } from './fileMatcher';
-import { IssueConverter } from './issueConverter';
-const rules: IRuleMetadata[] = require('../docs/rules');
+import {IConfig} from './codeclimateDefinitions';
+import {FileMatcher} from './fileMatcher';
+import {IssueConverter} from './issueConverter';
+import autobind = require('autobind-decorator');
 
-interface ICodeClimateTslintEngineConfig {
-  include_paths?: string[];
-  exclude_paths?: string[];
-  configuration?: any;
-}
-
+@autobind
 export class TsLinter {
-  static defaultTsLintFile = '/usr/src/app/tslint.json';
-  static configFile = '/config.json';
-  static codeDirectoryBase = '/code/';
-  static defaultExcludePaths: string[] = [
-    'node_modules',
-    'typings'
-  ];
+  static defaultTsLintFileName: string = 'tslint.json';
+  static defaultTsLintFilePath: string = `/usr/src/app/tslint.json`;
 
-  converter: IssueConverter = new IssueConverter(rules);
+  linterOption: ILinterOptions = {
+    fix: false,
+    formatter: 'json'
+  };
+  tsLintFilePath: string;
+  protected readonly fileMatcher: FileMatcher;
+  protected readonly issueConverter: IssueConverter;
+
+  constructor(
+    public basePath: string,
+    public config: IConfig,
+    public rules: IRuleMetadata[]
+  ) {
+    this.tsLintFilePath = this.getTsLintFilePath();
+    this.fileMatcher = new FileMatcher(this.basePath, ['.ts', '.tsx']);
+    this.issueConverter = new IssueConverter(basePath, rules);
+  }
 
   lint(): rx.Observable<CodeClimate.IIssue> {
-    const config: ICodeClimateTslintEngineConfig = this.loadConfig();
-    const linterOptions: ILinterOptions = this.createLinterOptionFromConfig(config);
-
-    return this.listFiles(config)
-      .flatMap<CodeClimate.IIssue>((file: string) => this.doLint(file, linterOptions));
+    return rx.Observable.fromArray(this.listFiles())
+      .flatMap<CodeClimate.IIssue>(this.doLint);
   }
 
-  private loadConfig(): ICodeClimateTslintEngineConfig {
-    const codeClimateConfig: CodeClimate.IConfig = (
-        fs.existsSync(TsLinter.configFile) &&
-        fs.statSync(TsLinter.configFile).isFile()
-      ) ?
-      JSON.parse(fs.readFileSync(TsLinter.configFile).toString('utf-8')) :
-      { enabled: true };
-    const config: ICodeClimateTslintEngineConfig = {};
-
-    // resolve paths setting
-    if (codeClimateConfig.include_paths) {
-      config.include_paths = codeClimateConfig.include_paths;
-    } else {
-      config.exclude_paths = TsLinter.defaultExcludePaths;
-    }
-
-    return config;
+  listFiles(): string[] {
+    return this.fileMatcher.matchFiles(this.config.include_paths);
   }
 
-  private createLinterOptionFromConfig(config: ICodeClimateTslintEngineConfig): ILinterOptions {
-    return {
-      fix: false,
-      formatter: 'json',
-      configuration: config.configuration,
-      formattersDirectory: 'customFormatters/',
-      rulesDirectory: []
-    };
-  }
-
-  private listFiles(config: ICodeClimateTslintEngineConfig): rx.Observable<string> {
-    const matcher = new FileMatcher(TsLinter.codeDirectoryBase, ['.ts', '.tsx']);
-    return config.include_paths ?
-      matcher.inclusionBasedFileListBuilder(config.include_paths) :
-      matcher.exclusionBasedFileListBuilder(config.exclude_paths || []);
-  }
-
-  private doLint(fileName: string, options: ILinterOptions): rx.Observable<CodeClimate.IIssue> {
-    const contents = fs.readFileSync(fileName, 'utf8');
-    const linter = new Linter(options);
-
-    // resolve rules
-    const codeClimateConfig: CodeClimate.IConfig = (
-        fs.existsSync(TsLinter.configFile) &&
-        fs.statSync(TsLinter.configFile).isFile()
-      ) ?
-      JSON.parse(fs.readFileSync(TsLinter.configFile).toString('utf-8')) :
-      { enabled: true };
-    const tslintFileName: string = _.find([
-      path.join(TsLinter.codeDirectoryBase, codeClimateConfig.config || 'tslint.json'),
-      TsLinter.defaultTsLintFile
+  private getTsLintFilePath(): string {
+    return _.find([
+      path.join(this.basePath, this.config.config || TsLinter.defaultTsLintFileName),
+      TsLinter.defaultTsLintFilePath
     ], (file) => fs.existsSync(file));
+  }
 
-    const configLoad = Configuration.findConfiguration(tslintFileName, fileName);
+  private doLint(fileName: string): rx.Observable<CodeClimate.IIssue> {
+    const linter: Linter = this.createLinter();
+    const contents = fs.readFileSync(fileName, 'utf8');
+    const configLoad: IConfigurationLoadResult = Configuration.findConfiguration(this.tsLintFilePath, fileName);
 
     linter.lint(fileName, contents, configLoad.results);
+
     return rx.Observable
       .fromArray(linter.getResult().failures)
-      .map(this.converter.convert)
-      .catch((e: any) => rx.Observable.just(this.createIssueFromError(e)));
+      .map(this.issueConverter.convert)
+      .catch((e: any) => rx.Observable.just(this.createIssueFromError(e)))
+      ;
+  }
+
+  protected createLinter(): Linter {
+    return new Linter(this.linterOption);
   }
 
   private createIssueFromError(e: Error): CodeClimate.IIssue {

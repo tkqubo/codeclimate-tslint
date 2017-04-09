@@ -4,8 +4,9 @@ export type Location = ILineLocation|IPositionLocation;
 export type Position = ILineColumnPosition|IOffsetPosition;
 
 export interface IConfig {
-  include_paths?: string[];
   enabled?: boolean;
+  channel?: string;
+  include_paths: string[];
   config?: string;
 }
 
