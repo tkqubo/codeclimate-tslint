@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+
+module=$1
+npm -j ls $module | jq -r '.dependencies["'$module'"].version'

@@ -10,7 +10,7 @@ import * as CodeClimate from './codeclimateDefinitions';
 import {FileMatcher} from './fileMatcher';
 import {IssueConverter} from './issueConverter';
 import {ITsLinterOption} from './tsLinterOption';
-import autobind = require('autobind-decorator');
+const autobind: any = require('autobind-decorator');
 
 @autobind
 export class TsLinter {
@@ -70,7 +70,7 @@ export class TsLinter {
     return {
       type: CodeClimate.issueTypes.Issue,
       check_name: '(runtime error)',
-      description: e.message,
+      description: `${e.name}: ${e.message}\n${e.stack}`,
       categories: ['Bug Risk'],
       remediation_points: 50000,
       location: {

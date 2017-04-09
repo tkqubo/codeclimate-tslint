@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as handlebars from 'handlebars';
 import {IRuleMetadata} from 'tslint';
-import autobind = require('autobind-decorator');
+const autobind: any = require('autobind-decorator');
 
 handlebars.registerHelper('notesHeader', (rule: IRuleMetadata) => {
   return (rule.typescriptOnly || rule.hasFix || rule.requiresTypeInfo) ? `\n##### Notes\n` : '';
