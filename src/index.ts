@@ -16,7 +16,8 @@ function loadCodeClimateConfig(file: string): IConfig {
   if (fs.existsSync(file) && fs.statSync(file).isFile()) {
     return JSON.parse(fs.readFileSync(file).toString('utf-8'));
   } else {
-    return { enabled: true, include_paths: [] };
+    console.warn(`${file} does not exist, so defaulting to process all the file under the 'src' directory`);
+    return { enabled: true, include_paths: ['src'] };
   }
 }
 
