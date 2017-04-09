@@ -6,10 +6,11 @@ import {IRuleMetadata} from 'tslint';
 import {IConfig} from './codeclimateDefinitions';
 
 const configPath: string = '/config.json';
-const basePath: string = '/code/';
+const targetPath: string = '/code/';
+const linterPath: string = '/usr/src/app/';
 const rulesPath: string = '../docs/rules';
 
-const config: IConfig = loadCodeClimateConfig(configPath);
+const codeClimateConfig: IConfig = loadCodeClimateConfig(configPath);
 const rules: IRuleMetadata[] = require(rulesPath);
 
 function loadCodeClimateConfig(file: string): IConfig {
@@ -21,11 +22,12 @@ function loadCodeClimateConfig(file: string): IConfig {
   }
 }
 
-const tsLinter: TsLinter = new TsLinter(
-  basePath,
-  config,
+const tsLinter: TsLinter = new TsLinter({
+  targetPath,
+  linterPath,
+  codeClimateConfig,
   rules
-);
+});
 
 tsLinter
   .lint()

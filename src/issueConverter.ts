@@ -1,15 +1,20 @@
 'use strict';
 
-import { RuleFailure, RuleFailurePosition, IRuleMetadata } from 'tslint';
+import {IRuleMetadata, RuleFailure, RuleFailurePosition} from 'tslint';
+import * as _ from 'lodash';
 import * as CodeClimate from './codeclimateDefinitions';
+import {ContentRenderer} from './contentRenderer';
+import {ITsLinterOption} from './tsLinterOption';
 import autobind = require('autobind-decorator');
 
 @autobind
 export class IssueConverter {
   readonly filePattern: RegExp;
+  readonly contentRenderer: ContentRenderer;
 
-  constructor(basePath: string, private rules: IRuleMetadata[]) {
-    this.filePattern = new RegExp(`${basePath}(.*)`, 'i');
+  constructor(public option: ITsLinterOption) {
+    this.filePattern = new RegExp(`${option.targetPath}(.*)`, 'i');
+    this.contentRenderer = new ContentRenderer(option.linterPath);
   }
 
   convert(failure: RuleFailure): CodeClimate.IIssue {
@@ -27,27 +32,8 @@ export class IssueConverter {
   }
 
   private contentBody(name: string): string {
-    const rule = this.rules.find((el) =>  el.ruleName === name);
-    const examplesString = (rule.optionExamples || []).reduce((agg: string, ex: string) => {
-      return agg + '\n' + '```' + ex + '```';
-    }, '');
-    const schemaString = rule.options != null ? `
-      ## Schema
-      ${'```' + JSON.stringify(rule.options, null, 2) + '```'}
-    ` : '';
-
-    return `
-    # Rule: ${name}
-    ## Config
-    ${rule.optionsDescription}
-
-    ## Examples
-    ${examplesString}
-
-    ${schemaString}
-
-    For more information see [this page](https://palantir.github.io/tslint/rules/${name}).
-    `;
+    const rule: IRuleMetadata = _.find(this.option.rules, { ruleName: name });
+    return this.contentRenderer.render(rule);
   }
 
   private convertToLocation(failure: RuleFailure): CodeClimate.Location {
