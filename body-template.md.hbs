@@ -1,0 +1,39 @@
+# Rule: {{{rule.ruleName}}}
+
+{{{rule.description}}}{{#if rule.descriptionDetails }}
+
+{{{rule.descriptionDetails}}}
+{{/if}}
+{{#if rule.rationale }}
+
+##### Rationale
+
+{{{ rule.rationale }}}
+{{/if}}
+{{ notesHeader rule }}
+{{#if rule.typescriptOnly }}- **TypeScript Only**
+{{/if}}{{#if rule.hasFix }}- **Has Fix**
+{{/if}}{{#if rule.requiresTypeInfo }}- **Requires Type Info**
+{{/if}}
+
+{{#if rule.optionsDescription }}
+### Config
+
+{{{ rule.optionsDescription }}}
+{{/if}}
+{{#if rule.optionExamples }}
+
+##### Examples
+
+{{#each rule.optionExamples }}
+{{{json . false}}}
+{{/each}}
+{{/if}}
+
+{{#if rule.options }}
+##### Schema
+
+{{{json rule.options true }}}
+{{/if}}
+
+For more information see [this page](https://palantir.github.io/tslint/rules/{{{rule.ruleName}}}).

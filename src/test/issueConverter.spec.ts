@@ -3,13 +3,17 @@
 const assert = require('power-assert');
 import * as sinon from 'sinon';
 import * as ts from 'typescript';
-import { RuleFailure, IRuleMetadata } from 'tslint';
-import { IssueConverter } from '../issueConverter';
+import {IRuleMetadata, RuleFailure} from 'tslint';
+import {IssueConverter} from '../issueConverter';
 import * as CodeClimate from '../codeclimateDefinitions';
+import {IConfig} from '../codeclimateDefinitions';
 
 describe('IssueConverter', () => {
   it('.convert(failure: RuleFailure)', () => {
     // given
+    const linterPath: string = './';
+    const targetPath: string = '/base/path/';
+    const codeClimateConfig: IConfig = {include_paths: []};
     const failure = 'Style failed';
     const ruleName = 'foo-rule';
     const ruleMetadata: IRuleMetadata = {
@@ -23,10 +27,10 @@ describe('IssueConverter', () => {
         'foo', 'bar'
       ]
     };
-    const converter = new IssueConverter('/code/', [ruleMetadata]);
+    const converter = new IssueConverter({ targetPath, linterPath, codeClimateConfig, rules: [ruleMetadata] });
     const sourceFile = sinon.mock({}) as any as ts.SourceFile;
     const sourcePath = 'path/target-source-file.ts';
-    sourceFile.fileName = `/code/${sourcePath}`;
+    sourceFile.fileName = `${targetPath}${sourcePath}`;
     sourceFile.getLineAndCharacterOfPosition = (pos: number) => {
         return pos === 1 ? { line: 2, character: 30 } : { line: 8, character: 24 };
     };

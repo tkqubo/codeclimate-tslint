@@ -4,18 +4,17 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as _ from 'lodash';
 import * as rx from 'rxjs';
-import {Configuration, ILinterOptions, IRuleMetadata, Linter} from 'tslint';
+import {Configuration, ILinterOptions, Linter} from 'tslint';
 import {IConfigurationLoadResult} from 'tslint/lib/configuration';
 import * as CodeClimate from './codeclimateDefinitions';
-import {IConfig} from './codeclimateDefinitions';
 import {FileMatcher} from './fileMatcher';
 import {IssueConverter} from './issueConverter';
+import {ITsLinterOption} from './tsLinterOption';
 import autobind = require('autobind-decorator');
 
 @autobind
 export class TsLinter {
   static defaultTsLintFileName: string = 'tslint.json';
-  static defaultTsLintFilePath: string = `/usr/src/app/tslint.json`;
 
   linterOption: ILinterOptions = {
     fix: false,
@@ -26,13 +25,11 @@ export class TsLinter {
   protected readonly issueConverter: IssueConverter;
 
   constructor(
-    public basePath: string,
-    public config: IConfig,
-    public rules: IRuleMetadata[]
+    public option: ITsLinterOption
   ) {
     this.tsLintFilePath = this.getTsLintFilePath();
-    this.fileMatcher = new FileMatcher(this.basePath, ['.ts', '.tsx']);
-    this.issueConverter = new IssueConverter(basePath, rules);
+    this.fileMatcher = new FileMatcher(option.targetPath, ['.ts', '.tsx']);
+    this.issueConverter = new IssueConverter(option);
   }
 
   lint(): rx.Observable<CodeClimate.IIssue> {
@@ -41,13 +38,13 @@ export class TsLinter {
   }
 
   listFiles(): string[] {
-    return this.fileMatcher.matchFiles(this.config.include_paths);
+    return this.fileMatcher.matchFiles(this.option.codeClimateConfig.include_paths);
   }
 
   private getTsLintFilePath(): string {
     return _.find([
-      path.join(this.basePath, this.config.config || TsLinter.defaultTsLintFileName),
-      TsLinter.defaultTsLintFilePath
+      path.join(this.option.targetPath, this.option.codeClimateConfig.config || TsLinter.defaultTsLintFileName),
+      path.join(this.option.linterPath, TsLinter.defaultTsLintFileName)
     ], (file) => fs.existsSync(file));
   }
 
