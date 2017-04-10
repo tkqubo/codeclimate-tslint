@@ -23,7 +23,7 @@ describe('TsLinter', () => {
       let config = 'configured.json';
       let expected = path.join(targetPath, config);
       codeClimateConfig = {config, include_paths: []};
-      mock({ [expected]: 'exists', [templateFile]: 'exists' });
+      mock({ [expected]: '{}', [templateFile]: 'exists' });
       // When
       let tsLinter = new TsLinter({ targetPath, linterPath, codeClimateConfig, rules });
       // Then
@@ -35,7 +35,7 @@ describe('TsLinter', () => {
       // Given
       let expected = path.join(targetPath, TsLinter.defaultTsLintFileName);
       codeClimateConfig = {include_paths: []};
-      mock({ [expected]: 'exists', [templateFile]: 'exists' });
+      mock({ [expected]: '{}', [templateFile]: 'exists' });
       // When
       let tsLinter = new TsLinter({ targetPath, linterPath, codeClimateConfig, rules });
       // Then
@@ -46,7 +46,7 @@ describe('TsLinter', () => {
     it('returns default path if the specified file does not exist on the base path', done => {
       // Given
       let expected = path.join(linterPath, TsLinter.defaultTsLintFileName);
-      mock({ [expected]: 'exists', [templateFile]: 'exists' });
+      mock({ [expected]: '{}', [templateFile]: 'exists' });
       // When
       let tsLinter = new TsLinter({ targetPath, linterPath, codeClimateConfig, rules });
       // Then
@@ -57,7 +57,7 @@ describe('TsLinter', () => {
     it('returns default path if default tslint.json does not exist on the base path', done => {
       // Given
       let expected = path.join(linterPath, TsLinter.defaultTsLintFileName);
-      mock({ [expected]: 'exists', [templateFile]: 'exists' });
+      mock({ [expected]: '{}', [templateFile]: 'exists' });
       // When
       let tsLinter = new TsLinter({ targetPath, linterPath, codeClimateConfig, rules });
       // Then
@@ -69,6 +69,8 @@ describe('TsLinter', () => {
   describe('.listFiles()', () => {
     it('returns file list', done => {
       // Given
+      let tsLintPath = path.join(targetPath, TsLinter.defaultTsLintFileName);
+      mock({ [tsLintPath]: '{}', [templateFile]: 'exists' });
       let tsLinter = new TsLinter({ targetPath, linterPath, codeClimateConfig, rules });
       (tsLinter as any).fileMatcher = new class {
         matchFiles(): string[] { return ['file.ts']; }
@@ -77,6 +79,7 @@ describe('TsLinter', () => {
       let actual = tsLinter.listFiles();
       // Then
       assert.deepStrictEqual(actual, [ 'file.ts' ]);
+      mock.restore();
       done();
     });
   });
