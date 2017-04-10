@@ -10,7 +10,6 @@ import {ContentRenderer} from '../contentRenderer';
 const mock = require('mock-fs');
 const assert = require('power-assert');
 
-
 describe('TsLinter', () => {
   let linterPath: string = './';
   let targetPath: string = '/base/path/';
