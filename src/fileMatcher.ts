@@ -2,7 +2,7 @@
 import * as fs from 'fs';
 import * as glob from 'glob';
 import * as _ from 'lodash';
-import autobind = require('autobind-decorator');
+const autobind: any = require('autobind-decorator');
 
 @autobind
 export class FileMatcher {

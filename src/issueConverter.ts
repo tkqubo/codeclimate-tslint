@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import * as CodeClimate from './codeclimateDefinitions';
 import {ContentRenderer} from './contentRenderer';
 import {ITsLinterOption} from './tsLinterOption';
-import autobind = require('autobind-decorator');
+const autobind: any = require('autobind-decorator');
 
 @autobind
 export class IssueConverter {
@@ -32,8 +32,12 @@ export class IssueConverter {
   }
 
   private contentBody(name: string): string {
-    const rule: IRuleMetadata = _.find(this.option.rules, { ruleName: name });
-    return this.contentRenderer.render(rule);
+    const rule: IRuleMetadata | null = _.find(this.option.rules, { ruleName: name });
+    if (rule != null) {
+      return this.contentRenderer.render(rule);
+    } else {
+      throw new Error(`rule named ${name} is not found.`)
+    }
   }
 
   private convertToLocation(failure: RuleFailure): CodeClimate.Location {

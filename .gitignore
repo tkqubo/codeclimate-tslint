@@ -5,4 +5,4 @@ test/*.js
 test/*.js.map
 node_modules
 coverage
-docs/rules.json
+docs/
