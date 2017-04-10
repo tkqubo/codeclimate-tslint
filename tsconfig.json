@@ -5,7 +5,7 @@
     "module": "commonjs",
     "declaration": false,
     "noLib": false,
-    "emitDecoratorMetadata": false,
+    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "sourceMap": true,
     "pretty": true,
