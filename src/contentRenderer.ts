@@ -4,14 +4,16 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as handlebars from 'handlebars';
 import {IRuleMetadata} from 'tslint';
+import * as _ from 'lodash';
 const autobind: any = require('autobind-decorator');
 
 handlebars.registerHelper('notesHeader', (rule: IRuleMetadata) => {
   return (rule.typescriptOnly || rule.hasFix || rule.requiresTypeInfo) ? `\n##### Notes\n` : '';
 });
-handlebars.registerHelper('json', (obj: any, escape: boolean = false) => {
+handlebars.registerHelper('json', (obj: any, escape: boolean = false, prefix: string) => {
   const json = escape ? JSON.stringify(obj, null, 2) : obj;
-  return '```json\n' + json + '\n```';
+  const prefixString = !_.isEmpty(prefix) ? '"' + prefix + '": ' : '';
+  return '```json\n' + prefixString + json + '\n```';
 });
 
 @autobind
