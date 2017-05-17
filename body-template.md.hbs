@@ -26,14 +26,14 @@
 ##### Examples
 
 {{#each rule.optionExamples }}
-{{{json . false}}}
+{{{json . false ../rule.ruleName }}}
 {{/each}}
 {{/if}}
 
 {{#if rule.options }}
 ##### Schema
 
-{{{json rule.options true }}}
+{{{json rule.options true '' }}}
 {{/if}}
 
 For more information see [this page](https://palantir.github.io/tslint/rules/{{{rule.ruleName}}}).
