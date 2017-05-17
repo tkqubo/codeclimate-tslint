@@ -30,7 +30,7 @@ describe('ContentRenderer', () => {
         requiresTypeInfo: true,
         typescriptOnly: true
       };
-      const optionExamples = rule.optionExamples.map(o => '```json\n' + o + '\n```').join('\n');
+      const optionExamples = rule.optionExamples.map(o => '```json\n' + '"' + rule.ruleName + '": ' + o + '\n```').join('\n');
       const options = '```json\n' + JSON.stringify(rule.options, null, 2) + '\n```';
       const expected = `# Rule: ${rule.ruleName}
 
@@ -60,7 +60,8 @@ ${optionExamples}
 
 ${options}
 
-For more information see [this page](https://palantir.github.io/tslint/rules/${rule.ruleName}).`;
+For more information see [this page](https://palantir.github.io/tslint/rules/${rule.ruleName}).
+`;
       // When
       const actual = renderer.render(rule);
       // Then
