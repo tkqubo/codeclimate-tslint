@@ -19,8 +19,10 @@ RUN npm install --global yarn && \
 RUN adduser -u 9000 -D app
 
 COPY . /usr/src/app
-RUN chown -R app:app ./ && \
-  npm install && \
+RUN npm install --global yarn && \
+  chown -R app:app ./ && \
+  yarn install && \
+  npm uninstall --global yarn && \
   mv /tmp/engine.json ./
 RUN npm run build
 
