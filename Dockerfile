@@ -11,8 +11,7 @@ COPY ./bin/ ./bin/
 RUN npm install --global yarn && \
   apk --update add git jq && \
   yarn install && \
-  jq <engine.json ".version = \"$(bin/version tslint)\"" > /tmp/engine.json && \
-  mv {/tmp/,}engine.json && \
+  jq <engine.json ".version = \"$(bin/version tslint)\"" > /engine.json && \
   bin/get-tslint-rules && \
   chown -R app:app . && \
   apk del --purge git jq && \
