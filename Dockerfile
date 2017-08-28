@@ -3,16 +3,13 @@ LABEL maintainer "Kyle Holzinger <kylelholzinger@gmail.com>"
 
 WORKDIR /usr/src/app
 
-# For cache purpose
-ARG VER_TSLINT=5.0.0
-
 COPY engine.json ./
 COPY ./bin/ ./bin/
 
 RUN npm install --global yarn && \
   apk --update add git jq && \
-  bin/get-tslint-rules "$VER_TSLINT" && \
-  cat engine.json | jq ".version = \"$VER_TSLINT\"" > /tmp/engine.json && \
+  bin/get-tslint-rules "$(bin/version tslint)" && \
+  cat engine.json | jq ".version = \"$(bin/version tslint)\"" > /tmp/engine.json && \
   apk del --purge git jq && \
   npm uninstall --global yarn
 
