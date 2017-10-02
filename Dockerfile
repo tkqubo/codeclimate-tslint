@@ -1,32 +1,28 @@
 FROM mhart/alpine-node:6
 LABEL maintainer "Kyle Holzinger <kylelholzinger@gmail.com>"
 
+RUN adduser -u 9000 -D app
+
 WORKDIR /usr/src/app
 
-# For cache purpose
-ARG VER_TSLINT=5.0.0
-
-COPY engine.json ./
+COPY engine.json package.json yarn.lock ./
 COPY ./bin/ ./bin/
 
 RUN npm install --global yarn && \
   apk --update add git jq && \
-  bin/get-tslint-rules "$VER_TSLINT" && \
-  cat engine.json | jq ".version = \"$VER_TSLINT\"" > /tmp/engine.json && \
+  yarn install && \
+  jq <engine.json ".version = \"$(bin/version tslint)\"" > /engine.json && \
+  bin/get-tslint-rules && \
+  chown -R app:app . && \
   apk del --purge git jq && \
+  rm -rf /var/cache/apk/* /tmp/* ~/.npm && \
   npm uninstall --global yarn
 
-RUN adduser -u 9000 -D app
+USER app
 
-COPY . /usr/src/app
-RUN npm install --global yarn && \
-  chown -R app:app ./ && \
-  yarn install && \
-  npm uninstall --global yarn && \
-  mv /tmp/engine.json ./
+COPY . ./
 RUN npm run build
 
-USER app
 VOLUME /code
 WORKDIR /code
 
