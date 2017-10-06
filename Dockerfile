@@ -22,6 +22,7 @@ RUN npm install --global yarn && \
 USER app
 COPY . ./
 USER root
+RUN mkdir -p dist
 RUN chown app:app -R dist
 
 USER app
