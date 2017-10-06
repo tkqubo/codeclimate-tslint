@@ -18,9 +18,13 @@ RUN npm install --global yarn && \
   rm -rf /var/cache/apk/* /tmp/* ~/.npm && \
   npm uninstall --global yarn
 
-USER app
 
+USER app
 COPY . ./
+USER root
+RUN chown app:app -R dist
+
+USER app
 RUN npm run build
 
 VOLUME /code
