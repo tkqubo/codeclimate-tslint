@@ -8,7 +8,9 @@
     "class-name": true,
     "semicolon": [true, "always"],
     "triple-equals": [true, "allow-null-check"],
-    "eofline": true,
+    "eofline": {
+      "severity": "warning"
+    },
     "jsdoc-format": true,
     "member-access": false,
     "no-console": false,
