@@ -57,6 +57,15 @@ export class TsLinter {
 
     linter.lint(fileName, contents, this.configurationFile);
 
+    if (this.option.codeClimateConfig.ignore_warnings) {
+      return rx.Observable
+        .from(linter.getResult().failures)
+        .filter((failure) => failure.getRuleSeverity() !== 'warning')
+        .map(this.issueConverter.convert)
+        .catch((e: any) => rx.Observable.of(Utils.createIssueFromError(e)))
+        ;
+    }
+
     return rx.Observable
       .from(linter.getResult().failures)
       .map(this.issueConverter.convert)
