@@ -8,6 +8,7 @@ export interface IConfig {
   channel?: string;
   include_paths: string[];
   config?: string;
+  ignore_warnings?: boolean;
 }
 
 export interface IIssue {
