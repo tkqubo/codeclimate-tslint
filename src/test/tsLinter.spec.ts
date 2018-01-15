@@ -2,14 +2,13 @@
 
 import * as path from 'path';
 import * as ts from 'typescript';
-import {ILinterOptions, IRuleMetadata, LintResult, RuleFailure} from 'tslint';
+import {ILinterOptions, IRuleMetadata, Linter, LintResult, RuleFailure} from 'tslint';
 import {TsLinter} from '../tsLinter';
 import {IConfig, IIssue} from '../codeclimateDefinitions';
 import {ContentRenderer} from '../contentRenderer';
 import {ITsLinterOption} from '../tsLinterOption';
 import {IConfigurationFile} from 'tslint/lib/configuration';
 import * as rx from 'rxjs/Rx';
-import Linter = require('tslint/lib/linter');
 
 const mock = require('mock-fs');
 const assert = require('power-assert');

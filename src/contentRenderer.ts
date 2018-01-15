@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import * as handlebars from 'handlebars';
 import {IRuleMetadata} from 'tslint';
 import * as _ from 'lodash';
-const autobind: any = require('autobind-decorator');
+import autobind from 'autobind-decorator';
 
 handlebars.registerHelper('notesHeader', (rule: IRuleMetadata) => {
   return (rule.typescriptOnly || rule.hasFix || rule.requiresTypeInfo) ? `\n##### Notes\n` : '';
@@ -16,7 +16,6 @@ handlebars.registerHelper('json', (obj: any, escape: boolean = false, prefix: st
   return '```json\n' + prefixString + json + '\n```';
 });
 
-@autobind
 export class ContentRenderer {
   static templateFileName: string = 'body-template.md.hbs';
 
@@ -27,6 +26,7 @@ export class ContentRenderer {
     this.template = fs.readFileSync(templateFile).toString('UTF-8');
   }
 
+  @autobind
   render(rule: IRuleMetadata): string {
     return handlebars.compile(this.template)({rule});
   }

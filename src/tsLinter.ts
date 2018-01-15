@@ -12,10 +12,8 @@ import {IssueConverter} from './issueConverter';
 import {ITsLinterOption} from './tsLinterOption';
 import Utils from './utils';
 import {RuleFailure} from 'tslint/lib/language/rule/rule';
+import autobind from 'autobind-decorator';
 
-const autobind: any = require('autobind-decorator');
-
-@autobind
 export class TsLinter {
   static defaultTsLintFileName: string = 'tslint.json';
 
@@ -37,15 +35,18 @@ export class TsLinter {
     this.configurationFile = Configuration.findConfiguration(this.tsLintFilePath, '').results;
   }
 
+  @autobind
   lint(): rx.Observable<CodeClimate.IIssue> {
     return rx.Observable.from(this.listFiles())
       .flatMap(this.doLint);
   }
 
+  @autobind
   listFiles(): string[] {
     return this.fileMatcher.matchFiles(this.option.codeClimateConfig.include_paths);
   }
 
+  @autobind
   private getTsLintFilePath(): string {
     return _.find([
       path.join(this.option.targetPath, this.option.codeClimateConfig.config || TsLinter.defaultTsLintFileName),
@@ -53,6 +54,7 @@ export class TsLinter {
     ], (file) => fs.existsSync(file));
   }
 
+  @autobind
   private doLint(fileName: string): rx.Observable<CodeClimate.IIssue> {
     const contents = fs.readFileSync(fileName, 'utf8');
     const linter: Linter = this.createLinter();
@@ -69,6 +71,7 @@ export class TsLinter {
       ;
   }
 
+  @autobind
   protected createLinter(): Linter {
     return new Linter(this.linterOption);
   }
