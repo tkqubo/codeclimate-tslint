@@ -2,29 +2,32 @@
 
 import * as path from 'path';
 import * as ts from 'typescript';
-import {IRuleMetadata, LintResult, RuleFailure} from 'tslint';
+import {ILinterOptions, IRuleMetadata, LintResult, RuleFailure} from 'tslint';
 import {TsLinter} from '../tsLinter';
-import {IConfig} from '../codeclimateDefinitions';
-import Linter = require('tslint/lib/linter');
+import {IConfig, IIssue} from '../codeclimateDefinitions';
 import {ContentRenderer} from '../contentRenderer';
+import {ITsLinterOption} from '../tsLinterOption';
+import {IConfigurationFile} from 'tslint/lib/configuration';
+import * as rx from 'rxjs/Rx';
+import Linter = require('tslint/lib/linter');
+
 const mock = require('mock-fs');
 const assert = require('power-assert');
 
 describe('TsLinter', () => {
-  let linterPath: string = './';
-  let targetPath: string = '/base/path/';
-  let codeClimateConfig: IConfig = {include_paths: []};
-  let templateFile = path.join(linterPath, ContentRenderer.templateFileName);
-  let rules: IRuleMetadata[] = [];
+  const linterPath: string = './';
+  const targetPath: string = '/base/path/';
+  const templateFile = path.join(linterPath, ContentRenderer.templateFileName);
   describe('.tsLintFilePath', () => {
+    const rules: IRuleMetadata[] = [];
     it('returns the specified file on the base path', done => {
       // Given
-      let config = 'configured.json';
-      let expected = path.join(targetPath, config);
-      codeClimateConfig = {config, include_paths: []};
-      mock({ [expected]: '{}', [templateFile]: 'exists' });
+      const config = 'configured.json';
+      const codeClimateConfig: IConfig = {config, include_paths: []};
+      const expected = path.join(targetPath, config);
+      mock({[expected]: '{}', [templateFile]: 'exists'});
       // When
-      let tsLinter = new TsLinter({ targetPath, linterPath, codeClimateConfig, rules });
+      const tsLinter = new TsLinter({targetPath, linterPath, codeClimateConfig, rules});
       // Then
       assert.equal(tsLinter.tsLintFilePath, expected);
       mock.restore();
@@ -32,11 +35,11 @@ describe('TsLinter', () => {
     });
     it('returns path with default file name on the base path', done => {
       // Given
-      let expected = path.join(targetPath, TsLinter.defaultTsLintFileName);
-      codeClimateConfig = {include_paths: []};
-      mock({ [expected]: '{}', [templateFile]: 'exists' });
+      const codeClimateConfig: IConfig = {include_paths: []};
+      const expected = path.join(targetPath, TsLinter.defaultTsLintFileName);
+      mock({[expected]: '{}', [templateFile]: 'exists'});
       // When
-      let tsLinter = new TsLinter({ targetPath, linterPath, codeClimateConfig, rules });
+      const tsLinter = new TsLinter({targetPath, linterPath, codeClimateConfig, rules});
       // Then
       assert.equal(tsLinter.tsLintFilePath, expected);
       mock.restore();
@@ -44,10 +47,11 @@ describe('TsLinter', () => {
     });
     it('returns default path if the specified file does not exist on the base path', done => {
       // Given
-      let expected = path.join(linterPath, TsLinter.defaultTsLintFileName);
-      mock({ [expected]: '{}', [templateFile]: 'exists' });
+      const codeClimateConfig: IConfig = {include_paths: []};
+      const expected = path.join(linterPath, TsLinter.defaultTsLintFileName);
+      mock({[expected]: '{}', [templateFile]: 'exists'});
       // When
-      let tsLinter = new TsLinter({ targetPath, linterPath, codeClimateConfig, rules });
+      const tsLinter = new TsLinter({targetPath, linterPath, codeClimateConfig, rules});
       // Then
       assert.equal(tsLinter.tsLintFilePath, expected);
       mock.restore();
@@ -55,10 +59,11 @@ describe('TsLinter', () => {
     });
     it('returns default path if default tslint.json does not exist on the base path', done => {
       // Given
-      let expected = path.join(linterPath, TsLinter.defaultTsLintFileName);
-      mock({ [expected]: '{}', [templateFile]: 'exists' });
+      const codeClimateConfig: IConfig = {include_paths: []};
+      const expected = path.join(linterPath, TsLinter.defaultTsLintFileName);
+      mock({[expected]: '{}', [templateFile]: 'exists'});
       // When
-      let tsLinter = new TsLinter({ targetPath, linterPath, codeClimateConfig, rules });
+      const tsLinter = new TsLinter({targetPath, linterPath, codeClimateConfig, rules});
       // Then
       assert.equal(tsLinter.tsLintFilePath, expected);
       mock.restore();
@@ -66,92 +71,88 @@ describe('TsLinter', () => {
     });
   });
   describe('.listFiles()', () => {
+    const rules: IRuleMetadata[] = [];
     it('returns file list', done => {
       // Given
-      let tsLintPath = path.join(targetPath, TsLinter.defaultTsLintFileName);
-      mock({ [tsLintPath]: '{}', [templateFile]: 'exists' });
-      let tsLinter = new TsLinter({ targetPath, linterPath, codeClimateConfig, rules });
+      const tsLintPath = path.join(targetPath, TsLinter.defaultTsLintFileName);
+      mock({[tsLintPath]: '{}', [templateFile]: 'exists'});
+      const codeClimateConfig: IConfig = {include_paths: []};
+      const tsLinter = new TsLinter({targetPath, linterPath, codeClimateConfig, rules});
       (tsLinter as any).fileMatcher = new class {
-        matchFiles(): string[] { return ['file.ts']; }
+        matchFiles(): string[] {
+          return ['file.ts'];
+        }
       };
       // When
-      let actual = tsLinter.listFiles();
+      const actual = tsLinter.listFiles();
       // Then
-      assert.deepStrictEqual(actual, [ 'file.ts' ]);
+      assert.deepStrictEqual(actual, ['file.ts']);
       mock.restore();
       done();
     });
   });
   describe('.lint()', () => {
-    it('passes', done => {
-      // Given
-      let tslint = path.join(linterPath, TsLinter.defaultTsLintFileName);
-      mock({
-        [tslint]: '{}',
-        'file.ts': '',
-        [templateFile]: 'exists'
-      });
-      const ruleName = 'foo-rule';
-      const failureText = 'some failure';
-      const ruleMetadata: IRuleMetadata = {
-        description: 'foo',
-        ruleName,
-        type: 'style',
-        typescriptOnly: true,
-        options: null,
-        optionsDescription: '',
-        optionExamples: []
-      };
-      let fileName = "failed.ts";
-      let source = `'use strict';
+    // Mocked version of Linter
+    class MockedLinter extends Linter {
+      constructor(options: ILinterOptions, private dummyFailures: RuleFailure[]) { super(options); }
+      lint(fileName: string, source: string, configuration?: IConfigurationFile): void { }
+      getResult(): LintResult {
+        return {
+          errorCount: 2,
+          warningCount: 0,
+          failures: this.dummyFailures,
+          format: 'json',
+          output: 'output'
+        };
+      }
+    }
+    // Mocked version of TsLinter
+    class MockedTsLinter extends TsLinter {
+      constructor(option: ITsLinterOption, private dummyFailures: RuleFailure[]) { super(option); }
+      listFiles(): string[] { return ['file.ts']; }
+      protected createLinter(): Linter { return new MockedLinter(this.linterOption, this.dummyFailures); }
+    }
+
+    function createSourceFile(fileName: string): ts.SourceFile {
+      const source = `'use strict';
       var unused = 32;
       let object = {
         c: 42,
         a: false
       };
       `;
-      let sourceFile: ts.SourceFile = ts.createSourceFile(`${targetPath}${fileName}`, source, ts.ScriptTarget.ES2016);
-      class MockedTsLinter extends TsLinter {
-        listFiles(): string[] { return ['file.ts']; }
-        protected createLinter(): Linter {
-          return new class {
-            lint() { }
-            getResult(): LintResult {
-              return {
-                errorCount: 2,
-                warningCount: 0,
-                failures: [new RuleFailure(sourceFile, 1, 20, failureText, ruleName)],
-                format: 'json',
-                output: 'output'
-              };
-            }
-          } as any;
-        }
-      }
-      const expected = [
-        {
-          type: "issue",
-          check_name: ruleName,
-          content: {
-            body: "" // omit testing
-          },
-          description: failureText,
-          categories: [ "Style" ],
-          remediation_points: 50000,
-          location: {
-            path: fileName,
-            positions: {
-              begin: { line: 1, column: 2 },
-              end: { line: 2, column: 7 }
-            }
+      return ts.createSourceFile(`${targetPath}${fileName}`, source, ts.ScriptTarget.ES2016);
+    }
+    function mockPaths(): void {
+      const tslintPath = path.join(linterPath, TsLinter.defaultTsLintFileName);
+      mock({
+        [tslintPath]: '{}',
+        'file.ts': '',
+        [templateFile]: 'exists'
+      });
+    }
+    function createIssue(): IIssue {
+      return {
+        type: 'issue',
+        check_name: ruleName,
+        content: {
+          body: '' // omit testing
+        },
+        description: 'some failure',
+        categories: ['Style'],
+        remediation_points: 50000,
+        location: {
+          path: fileName,
+          positions: {
+            begin: {line: 1, column: 1},
+            end: {line: 1, column: 1}
           }
         }
-      ];
-      let tsLinter = new MockedTsLinter({ targetPath, linterPath, codeClimateConfig, rules: [ruleMetadata] });
-      // When
-      tsLinter
-        .lint()
-        // skip body comparison
+      };
+    }
+    function assertLintResult(actual: rx.Observable<IIssue>, expected: IIssue[], done: MochaDone): void {
+      actual
+      // skip body comparison
         .map(result => {
           result.content.body = '';
           return result;
@@ -166,6 +167,60 @@ describe('TsLinter', () => {
           assert.fail.bind(assert),
           mock.restore.bind(mock)
         );
+    }
+
+    const ruleName = 'foo-rule';
+    const rules: IRuleMetadata[] = [
+      {
+        description: 'foo',
+        ruleName,
+        type: 'style',
+        typescriptOnly: true,
+        options: null,
+        optionsDescription: '',
+        optionExamples: []
+      }
+    ];
+    const fileName = 'failed.ts';
+    const file = createSourceFile(fileName);
+    it('passes', done => {
+      // Given
+      mockPaths();
+      const codeClimateConfig: IConfig = {include_paths: []};
+      const tsLinterOption: ITsLinterOption = {targetPath, linterPath, codeClimateConfig, rules};
+      const location = {
+        path: fileName,
+        positions: {
+          begin: {line: 1, column: 2},
+          end: {line: 2, column: 7}
+        }
+      };
+      const issue: IIssue = {...createIssue(), location};
+      const failure: RuleFailure = new RuleFailure(file, 1, 20, issue.description, ruleName);
+      const tsLinter: TsLinter = new MockedTsLinter(tsLinterOption, [failure]);
+      const expected: IIssue[] = [issue];
+      // When
+      const actual = tsLinter.lint();
+      // Then
+      assertLintResult(actual, expected, done);
+    });
+    it('doesn\'t report warnings if ignore_warnings option is given', done => {
+      // Given
+      mockPaths();
+      const warningIssue: IIssue = {...createIssue(), description: 'some warning'};
+      const errorIssue: IIssue = {...createIssue(), description: 'some error'};
+      const codeClimateConfig: IConfig = {include_paths: [], ignore_warnings: true};
+      const tsLinterOption: ITsLinterOption = {targetPath, linterPath, codeClimateConfig, rules};
+      const warning: RuleFailure = new RuleFailure(file, 0, 0, warningIssue.description, ruleName);
+      warning.setRuleSeverity('warning');
+      const error: RuleFailure = new RuleFailure(file, 0, 0, errorIssue.description, ruleName);
+      error.setRuleSeverity('error');
+      const tsLinter: TsLinter = new MockedTsLinter(tsLinterOption, [warning, error]);
+      const expected: IIssue[] = [errorIssue]; // warningIssue is not included
+      // When
+      const actual = tsLinter.lint();
+      // Then
+      assertLintResult(actual, expected, done);
     });
   });
 });
