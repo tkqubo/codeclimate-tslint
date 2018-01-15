@@ -5,9 +5,8 @@ import * as _ from 'lodash';
 import * as CodeClimate from './codeclimateDefinitions';
 import {ContentRenderer} from './contentRenderer';
 import {ITsLinterOption} from './tsLinterOption';
-const autobind: any = require('autobind-decorator');
+import autobind from 'autobind-decorator';
 
-@autobind
 export class IssueConverter {
   readonly filePattern: RegExp;
   readonly contentRenderer: ContentRenderer;
@@ -17,6 +16,7 @@ export class IssueConverter {
     this.contentRenderer = new ContentRenderer(option.linterPath);
   }
 
+  @autobind
   convert(failure: RuleFailure): CodeClimate.IIssue {
     return {
       type: CodeClimate.issueTypes.Issue,
@@ -31,6 +31,7 @@ export class IssueConverter {
     };
   }
 
+  @autobind
   private contentBody(name: string): string {
     const rule: IRuleMetadata | null = _.find(this.option.rules, { ruleName: name });
     if (rule != null) {
@@ -40,6 +41,7 @@ export class IssueConverter {
     }
   }
 
+  @autobind
   private convertToLocation(failure: RuleFailure): CodeClimate.Location {
     return {
       path: this.getFilePath(failure),
