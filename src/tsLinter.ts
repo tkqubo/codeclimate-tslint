@@ -11,6 +11,8 @@ import {FileMatcher} from './fileMatcher';
 import {IssueConverter} from './issueConverter';
 import {ITsLinterOption} from './tsLinterOption';
 import Utils from './utils';
+import {RuleFailure} from 'tslint/lib/language/rule/rule';
+
 const autobind: any = require('autobind-decorator');
 
 @autobind
@@ -57,17 +59,11 @@ export class TsLinter {
 
     linter.lint(fileName, contents, this.configurationFile);
 
+    let observable: rx.Observable<RuleFailure> = rx.Observable.from(linter.getResult().failures);
     if (this.option.codeClimateConfig.ignore_warnings) {
-      return rx.Observable
-        .from(linter.getResult().failures)
-        .filter((failure) => failure.getRuleSeverity() !== 'warning')
-        .map(this.issueConverter.convert)
-        .catch((e: any) => rx.Observable.of(Utils.createIssueFromError(e)))
-        ;
+      observable = observable.filter(failure => failure.getRuleSeverity() !== 'warning')
     }
-
-    return rx.Observable
-      .from(linter.getResult().failures)
+    return observable
       .map(this.issueConverter.convert)
       .catch((e: any) => rx.Observable.of(Utils.createIssueFromError(e)))
       ;
