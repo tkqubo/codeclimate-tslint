@@ -37,6 +37,11 @@
   },
   "homepage": "https://github.com/tkqubo/codeclimate-tslint#readme",
   "devDependencies": {
+    "@angular/common": "^5.2.0",
+    "@angular/compiler": "^5.2.0",
+    "@angular/core": "^5.2.0",
+    "@angular/platform-browser": "^5.2.0",
+    "@angular/platform-browser-dynamic": "^5.2.0",
     "@types/glob": "^5.0.30",
     "@types/lodash": "^4.14.62",
     "@types/mocha": "^2.2.40",
@@ -56,10 +61,12 @@
     "proxyquire": "^1.7.11",
     "remap-istanbul": "^0.10.0",
     "sinon": "^4.1.5",
-    "typescript": "^2.6.2"
+    "typescript": "^2.6.2",
+    "zone.js": "^0.8.20"
   },
   "dependencies": {
     "@types/handlebars": "^4.0.32",
+    "codelyzer": "^4.0.2",
     "handlebars": "^4.0.6",
     "lodash": "^4.17.4",
     "rxjs": "^5.3.0",
