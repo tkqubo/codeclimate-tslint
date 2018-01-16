@@ -4,16 +4,21 @@ import * as fs from 'fs';
 import {TsLinter} from './tsLinter';
 import {IRuleMetadata} from 'tslint';
 import {IConfig} from './codeclimateDefinitions';
-import {loadTslintEslintRules} from './rule-loaders/loadTslintEslintRules';
+import RuleLoader from './ruleLoader';
 
 const configPath: string = '/config.json';
 const targetPath: string = '/code/';
 const linterPath: string = '/usr/src/app/';
 const rulesPath: string = '../docs/tslint-rules';
 
+const tslintEslintRulesPath = 'node_modules/tslint-eslint-rules/dist/rules';
+const codelyzerRulesPath = 'node_modules/codelyzer';
+
 const codeClimateConfig: IConfig = loadCodeClimateConfig(configPath);
+const ruleLoader = new RuleLoader(linterPath);
 const rules: IRuleMetadata[] = (require(rulesPath) as IRuleMetadata[])
-  .concat(loadTslintEslintRules(linterPath))
+  .concat(ruleLoader.loadRules(tslintEslintRulesPath))
+  .concat(ruleLoader.loadRules(codelyzerRulesPath))
 ;
 
 function loadCodeClimateConfig(file: string): IConfig {
