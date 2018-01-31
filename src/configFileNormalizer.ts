@@ -4,6 +4,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import {RawConfigFile} from 'tslint/lib/configuration';
 
+const JSONC: any = require('json-comments');
+
 /**
  * Normalizes tsconfg.json file.
  * Currently doing these stuffs.
@@ -13,7 +15,7 @@ import {RawConfigFile} from 'tslint/lib/configuration';
  */
 export class ConfigFileNormalizer {
   normalize(inPath: string, outPath: string, altRulesDirectory: string) {
-    const rawConfig: RawConfigFile = JSON.parse(fs.readFileSync(inPath).toString('UTF-8'));
+    const rawConfig: RawConfigFile = JSONC.parse(fs.readFileSync(inPath).toString('UTF-8'));
     if (typeof rawConfig.rulesDirectory === 'string') {
       rawConfig.rulesDirectory = this.normalizeRulesDirectoryPath(rawConfig.rulesDirectory, altRulesDirectory);
     } else if (rawConfig.rulesDirectory !== undefined) {
