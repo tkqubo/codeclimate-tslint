@@ -23,20 +23,18 @@ export class TsLinter {
     formatter: 'json'
   };
   originalConfigPath: string;
-  normalizedConfigPath: string;
   protected readonly fileMatcher: FileMatcher;
   protected readonly issueConverter: IssueConverter;
   protected readonly configurationFile: IConfigurationFile;
 
   constructor(
-    public option: ITsLinterOption, configFileNormalizer: ConfigFileNormalizer = new ConfigFileNormalizer()
+    public option: ITsLinterOption, configFileNormalizer: ConfigFileNormalizer = new ConfigFileNormalizer(option.linterPath)
   ) {
     this.fileMatcher = new FileMatcher(option.targetPath, ['.ts', '.tsx']);
     this.issueConverter = new IssueConverter(option);
     this.originalConfigPath = this.getTsLintFilePath();
-    this.normalizedConfigPath = path.join(this.option.linterPath, `temp_${TsLinter.defaultTsLintFileName}`);
-    configFileNormalizer.normalize(this.originalConfigPath, this.normalizedConfigPath, option.linterPath);
-    this.configurationFile = Configuration.findConfiguration(this.normalizedConfigPath, '').results;
+    const normalizedConfigPath = configFileNormalizer.normalize(this.originalConfigPath, option.linterPath);
+    this.configurationFile = Configuration.findConfiguration(normalizedConfigPath, '').results;
   }
 
   @autobind

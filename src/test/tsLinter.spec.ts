@@ -9,6 +9,7 @@ import {ContentRenderer} from '../contentRenderer';
 import {ITsLinterOption} from '../tsLinterOption';
 import {IConfigurationFile} from 'tslint/lib/configuration';
 import * as rx from 'rxjs/Rx';
+import {ConfigFileNormalizer} from '../configFileNormalizer';
 
 const mock = require('mock-fs');
 const assert = require('power-assert');
@@ -17,6 +18,9 @@ describe('TsLinter', () => {
   const linterPath: string = './';
   const targetPath: string = '/base/path/';
   const templateFile = path.join(linterPath, ContentRenderer.templateFileName);
+  class MockedConfigFileNormalizer extends ConfigFileNormalizer {
+    normalize(inPath: string, altRulesDirectory: string): string { return super.baseOutDir; }
+  }
   describe('.originalConfigPath', () => {
     const rules: IRuleMetadata[] = [];
     it('returns the specified file on the base path', done => {
@@ -26,7 +30,7 @@ describe('TsLinter', () => {
       const expected = path.join(targetPath, config);
       mock({[expected]: '{}', [templateFile]: 'exists'});
       // When
-      const tsLinter = new TsLinter({targetPath, linterPath, codeClimateConfig, rules});
+      const tsLinter = new TsLinter({targetPath, linterPath, codeClimateConfig, rules}, new MockedConfigFileNormalizer(targetPath));
       // Then
       assert.equal(tsLinter.originalConfigPath, expected);
       mock.restore();
@@ -38,7 +42,7 @@ describe('TsLinter', () => {
       const expected = path.join(targetPath, TsLinter.defaultTsLintFileName);
       mock({[expected]: '{}', [templateFile]: 'exists'});
       // When
-      const tsLinter = new TsLinter({targetPath, linterPath, codeClimateConfig, rules});
+      const tsLinter = new TsLinter({targetPath, linterPath, codeClimateConfig, rules}, new MockedConfigFileNormalizer(targetPath));
       // Then
       assert.equal(tsLinter.originalConfigPath, expected);
       mock.restore();
@@ -50,7 +54,7 @@ describe('TsLinter', () => {
       const expected = path.join(linterPath, TsLinter.defaultTsLintFileName);
       mock({[expected]: '{}', [templateFile]: 'exists'});
       // When
-      const tsLinter = new TsLinter({targetPath, linterPath, codeClimateConfig, rules});
+      const tsLinter = new TsLinter({targetPath, linterPath, codeClimateConfig, rules}, new MockedConfigFileNormalizer(targetPath));
       // Then
       assert.equal(tsLinter.originalConfigPath, expected);
       mock.restore();
@@ -62,7 +66,7 @@ describe('TsLinter', () => {
       const expected = path.join(linterPath, TsLinter.defaultTsLintFileName);
       mock({[expected]: '{}', [templateFile]: 'exists'});
       // When
-      const tsLinter = new TsLinter({targetPath, linterPath, codeClimateConfig, rules});
+      const tsLinter = new TsLinter({targetPath, linterPath, codeClimateConfig, rules}, new MockedConfigFileNormalizer(targetPath));
       // Then
       assert.equal(tsLinter.originalConfigPath, expected);
       mock.restore();
@@ -76,7 +80,7 @@ describe('TsLinter', () => {
       const tsLintPath = path.join(targetPath, TsLinter.defaultTsLintFileName);
       mock({[tsLintPath]: '{}', [templateFile]: 'exists'});
       const codeClimateConfig: IConfig = {include_paths: []};
-      const tsLinter = new TsLinter({targetPath, linterPath, codeClimateConfig, rules});
+      const tsLinter = new TsLinter({targetPath, linterPath, codeClimateConfig, rules}, new MockedConfigFileNormalizer(targetPath));
       (tsLinter as any).fileMatcher = new class {
         matchFiles(): string[] {
           return ['file.ts'];
@@ -107,7 +111,7 @@ describe('TsLinter', () => {
     }
     // Mocked version of TsLinter
     class MockedTsLinter extends TsLinter {
-      constructor(option: ITsLinterOption, private dummyFailures: RuleFailure[]) { super(option); }
+      constructor(option: ITsLinterOption, private dummyFailures: RuleFailure[]) { super(option, new MockedConfigFileNormalizer(option.linterPath)); }
       listFiles(): string[] { return ['file.ts']; }
       protected createLinter(): Linter { return new MockedLinter(this.linterOption, this.dummyFailures); }
     }
