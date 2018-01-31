@@ -13,6 +13,7 @@ import {ITsLinterOption} from './tsLinterOption';
 import Utils from './utils';
 import {RuleFailure} from 'tslint/lib/language/rule/rule';
 import autobind from 'autobind-decorator';
+import {ConfigFileNormalizer} from './configFileNormalizer';
 
 export class TsLinter {
   static defaultTsLintFileName: string = 'tslint.json';
@@ -21,18 +22,21 @@ export class TsLinter {
     fix: false,
     formatter: 'json'
   };
-  tsLintFilePath: string;
+  originalConfigPath: string;
+  normalizedConfigPath: string;
   protected readonly fileMatcher: FileMatcher;
   protected readonly issueConverter: IssueConverter;
   protected readonly configurationFile: IConfigurationFile;
 
   constructor(
-    public option: ITsLinterOption
+    public option: ITsLinterOption, configFileNormalizer: ConfigFileNormalizer = new ConfigFileNormalizer()
   ) {
-    this.tsLintFilePath = this.getTsLintFilePath();
     this.fileMatcher = new FileMatcher(option.targetPath, ['.ts', '.tsx']);
     this.issueConverter = new IssueConverter(option);
-    this.configurationFile = Configuration.findConfiguration(this.tsLintFilePath, '').results;
+    this.originalConfigPath = this.getTsLintFilePath();
+    this.normalizedConfigPath = path.join(this.option.linterPath, `temp_${TsLinter.defaultTsLintFileName}`);
+    configFileNormalizer.normalize(this.originalConfigPath, this.normalizedConfigPath, option.linterPath);
+    this.configurationFile = Configuration.findConfiguration(this.normalizedConfigPath, '').results;
   }
 
   @autobind
