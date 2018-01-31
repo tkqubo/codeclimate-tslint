@@ -17,7 +17,7 @@ describe('TsLinter', () => {
   const linterPath: string = './';
   const targetPath: string = '/base/path/';
   const templateFile = path.join(linterPath, ContentRenderer.templateFileName);
-  describe('.tsLintFilePath', () => {
+  describe('.originalConfigPath', () => {
     const rules: IRuleMetadata[] = [];
     it('returns the specified file on the base path', done => {
       // Given
@@ -28,7 +28,7 @@ describe('TsLinter', () => {
       // When
       const tsLinter = new TsLinter({targetPath, linterPath, codeClimateConfig, rules});
       // Then
-      assert.equal(tsLinter.tsLintFilePath, expected);
+      assert.equal(tsLinter.originalConfigPath, expected);
       mock.restore();
       done();
     });
@@ -40,7 +40,7 @@ describe('TsLinter', () => {
       // When
       const tsLinter = new TsLinter({targetPath, linterPath, codeClimateConfig, rules});
       // Then
-      assert.equal(tsLinter.tsLintFilePath, expected);
+      assert.equal(tsLinter.originalConfigPath, expected);
       mock.restore();
       done();
     });
@@ -52,7 +52,7 @@ describe('TsLinter', () => {
       // When
       const tsLinter = new TsLinter({targetPath, linterPath, codeClimateConfig, rules});
       // Then
-      assert.equal(tsLinter.tsLintFilePath, expected);
+      assert.equal(tsLinter.originalConfigPath, expected);
       mock.restore();
       done();
     });
@@ -64,7 +64,7 @@ describe('TsLinter', () => {
       // When
       const tsLinter = new TsLinter({targetPath, linterPath, codeClimateConfig, rules});
       // Then
-      assert.equal(tsLinter.tsLintFilePath, expected);
+      assert.equal(tsLinter.originalConfigPath, expected);
       mock.restore();
       done();
     });
