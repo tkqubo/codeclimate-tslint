@@ -28,9 +28,16 @@ export class ConfigFileNormalizer {
     } else if (rawConfig.rulesDirectory !== undefined) {
       rawConfig.rulesDirectory = rawConfig.rulesDirectory.map(dir => this.normalizeRulesDirectoryPath(dir, altRulesDirectory));
     }
+    this.ensureTemporaryDirectory();
     const outPath = this.randomFilePath();
     fs.writeFileSync(outPath, JSON.stringify(rawConfig), 'UTF-8');
     return outPath;
+  }
+
+  private ensureTemporaryDirectory() {
+    if (!fs.existsSync(tmpJsonPath)) {
+      fs.mkdirSync(tmpJsonPath);
+    }
   }
 
   private normalizeRulesDirectoryPath(dirPath: string, altRulesDirectory: string): string {
