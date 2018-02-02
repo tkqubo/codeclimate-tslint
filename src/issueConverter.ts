@@ -7,6 +7,12 @@ import {ContentRenderer} from './contentRenderer';
 import {ITsLinterOption} from './tsLinterOption';
 import autobind from 'autobind-decorator';
 
+export class RuleNameNotFoundError extends Error {
+  constructor(public ruleName: string) {
+    super(`rule named ${ruleName} is not found in the metadata.`);
+  }
+}
+
 export class IssueConverter {
   readonly filePattern: RegExp;
   readonly contentRenderer: ContentRenderer;
@@ -37,7 +43,7 @@ export class IssueConverter {
     if (rule != null) {
       return this.contentRenderer.render(rule);
     } else {
-      throw new Error(`rule named ${name} is not found.`)
+      throw new RuleNameNotFoundError(name)
     }
   }
 
