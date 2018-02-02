@@ -15,7 +15,7 @@ class Utils {
     };
   }
 
-  createIssueFromError(e: Error): CodeClimate.IIssue {
+  createIssueFromError(e: Error, path: string): CodeClimate.IIssue {
     return {
       type: CodeClimate.issueTypes.Issue,
       check_name: '(runtime error)',
@@ -23,7 +23,7 @@ class Utils {
       categories: ['Bug Risk'],
       remediation_points: 50000,
       location: {
-        path: '',
+        path,
         positions: {
           begin: { line: 0, column: 0 },
           end: { line: 0, column: 0 }

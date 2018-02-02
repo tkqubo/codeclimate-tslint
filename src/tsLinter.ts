@@ -23,9 +23,9 @@ export class TsLinter {
     formatter: 'json'
   };
   originalConfigPath: string;
-  protected readonly fileMatcher: FileMatcher;
-  protected readonly issueConverter: IssueConverter;
-  protected readonly configurationFile: IConfigurationFile;
+  fileMatcher: FileMatcher;
+  issueConverter: IssueConverter;
+  configurationFile: IConfigurationFile;
 
   constructor(
     public option: ITsLinterOption, configFileNormalizer: ConfigFileNormalizer = new ConfigFileNormalizer(option.linterPath)
@@ -69,8 +69,14 @@ export class TsLinter {
     }
     return observable
       .map(this.issueConverter.convert)
-      .catch((e: any) => rx.Observable.of(Utils.createIssueFromError(e)))
+      .catch((e: any) => rx.Observable.of(Utils.createIssueFromError(e, this.getRelativeFilePath(fileName))))
       ;
+  }
+
+  getRelativeFilePath(fileName: string): string {
+    const dirname = path.dirname(fileName);
+    const basename = path.basename(fileName);
+    return path.join(path.relative(this.option.targetPath, dirname), basename);
   }
 
   @autobind
