@@ -13,6 +13,7 @@ import {ITsLinterOption} from './tsLinterOption';
 import Utils from './utils';
 import {RuleFailure} from 'tslint/lib/language/rule/rule';
 import autobind from 'autobind-decorator';
+import {ConfigFileNormalizer} from './configFileNormalizer';
 
 export class TsLinter {
   static defaultTsLintFileName: string = 'tslint.json';
@@ -21,18 +22,19 @@ export class TsLinter {
     fix: false,
     formatter: 'json'
   };
-  tsLintFilePath: string;
-  protected readonly fileMatcher: FileMatcher;
-  protected readonly issueConverter: IssueConverter;
-  protected readonly configurationFile: IConfigurationFile;
+  originalConfigPath: string;
+  fileMatcher: FileMatcher;
+  issueConverter: IssueConverter;
+  configurationFile: IConfigurationFile;
 
   constructor(
-    public option: ITsLinterOption
+    public option: ITsLinterOption, configFileNormalizer: ConfigFileNormalizer = new ConfigFileNormalizer(option.linterPath)
   ) {
-    this.tsLintFilePath = this.getTsLintFilePath();
     this.fileMatcher = new FileMatcher(option.targetPath, ['.ts', '.tsx']);
     this.issueConverter = new IssueConverter(option);
-    this.configurationFile = Configuration.findConfiguration(this.tsLintFilePath, '').results;
+    this.originalConfigPath = this.getTsLintFilePath();
+    const normalizedConfigPath = configFileNormalizer.normalize(this.originalConfigPath, option.linterPath);
+    this.configurationFile = Configuration.findConfiguration(normalizedConfigPath, '').results;
   }
 
   @autobind
@@ -67,8 +69,14 @@ export class TsLinter {
     }
     return observable
       .map(this.issueConverter.convert)
-      .catch((e: any) => rx.Observable.of(Utils.createIssueFromError(e)))
+      .catch((e: any) => rx.Observable.of(Utils.createIssueFromError(e, this.getRelativeFilePath(fileName))))
       ;
+  }
+
+  getRelativeFilePath(fileName: string): string {
+    const dirname = path.dirname(fileName);
+    const basename = path.basename(fileName);
+    return path.join(path.relative(this.option.targetPath, dirname), basename);
   }
 
   @autobind

@@ -2,6 +2,7 @@
 
 import {IRuleMetadata} from 'tslint';
 import * as CodeClimate from './codeclimateDefinitions';
+import {RuleNameNotFoundError} from './issueConverter';
 
 class Utils {
   createEmptyRuleMetadata(ruleName: string): IRuleMetadata {
@@ -15,21 +16,29 @@ class Utils {
     };
   }
 
-  createIssueFromError(e: Error): CodeClimate.IIssue {
+  createIssueFromError(e: Error, path: string): CodeClimate.IIssue {
     return {
       type: CodeClimate.issueTypes.Issue,
-      check_name: '(runtime error)',
-      description: `${e.name}: ${e.message}\n${e.stack}`,
+      check_name: this.resolveCheckName(e),
+      description: `Sorry, description could not be provided due to the internal error:\n${e.stack}`,
       categories: ['Bug Risk'],
       remediation_points: 50000,
       location: {
-        path: '',
+        path,
         positions: {
           begin: { line: 0, column: 0 },
           end: { line: 0, column: 0 }
         }
       }
     };
+  }
+
+  private resolveCheckName(e: Error): string {
+    if (e instanceof RuleNameNotFoundError) {
+      return e.ruleName;
+    } else {
+      return '(runtime error)';
+    }
   }
 }
 
