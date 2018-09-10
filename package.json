@@ -14,7 +14,6 @@
     "test": "npm run build && npm run istanbul && npm run test:report",
     "test:watch": "npm run build:watch && npm run istanbul:watch",
     "test:mocha": "npm run build && npm run mocha",
-    "test:report": "codeclimate-test-reporter < coverage/lcov.ts.info",
     "mocha": "mocha dist/test/*.spec.js",
     "istanbul": "istanbul cover _mocha -- dist/test/*.spec.js && npm run istanbul:remap",
     "istanbul:remap": "remap-istanbul -i coverage/coverage.json -o coverage/lcov.ts.info -t lcovonly",
