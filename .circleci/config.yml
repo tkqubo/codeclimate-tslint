@@ -25,7 +25,7 @@ jobs:
           command: |
             ./cc-test-reporter before-build
             yarn test
-            ./cc-test-reporter after-build --exit-code $EXIT_CODE
+            ./cc-test-reporter after-build --exit-code $?
 
   deploy:
     docker:
