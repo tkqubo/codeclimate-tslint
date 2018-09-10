@@ -73,19 +73,11 @@
     "tslint-react": "3.4.0"
   },
   "nyc": {
-    "include": [
-      "src/**/*.ts"
-    ],
-    "extension": [
-      ".ts"
-    ],
-    "require": [
-      "ts-node/register"
-    ],
-    "reporter": [
-      "text",
-      "lcov"
-    ],
+    "include": ["src/**/*.ts"],
+    "exclude": ["src/**/*.spec.ts"],
+    "extension": [".ts"],
+    "require": ["ts-node/register"],
+    "reporter": ["text", "html", "lcov"],
     "sourceMap": true,
     "instrument": true
   }
