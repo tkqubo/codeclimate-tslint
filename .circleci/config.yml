@@ -26,6 +26,8 @@ jobs:
             ./cc-test-reporter before-build
             yarn test
             ./cc-test-reporter after-build --exit-code $?
+      - store_artifacts:
+          path: coverage
 
   deploy:
     docker:
