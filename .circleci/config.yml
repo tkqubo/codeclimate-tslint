@@ -4,7 +4,6 @@ jobs:
     docker:
       - image: node:8.11
     steps:
-      - setup_remote_docker
       - checkout
       - run:
           name: Install cc-test-reporter
@@ -20,7 +19,24 @@ jobs:
             ./cc-test-reporter before-build
             npm test
             ./cc-test-reporter after-build --exit-code $EXIT_CODE
+  deploy:
+    docker:
+      - image: debian
+        environment:
+          REPOSITORY: tkqubo/codeclimate-tslint
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: docker login -u $DOCKER_EMAIL -p $DOCKER_AUTH
+      - run: docker build -t=$REPOSITORY:b$CIRCLE_BUILD_NUM .
+      - run: docker push $REPOSITORY:b$CIRCLE_BUILD_NUM
 workflows:
   version: 2
   jobs:
     - build
+    - deploy:
+        requires:
+          - build
+        filters:
+          branches:
+            only: master
