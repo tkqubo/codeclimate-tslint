@@ -11,7 +11,7 @@
     "docker": "npm run docker:build && npm run docker:run",
     "docker:build": "docker build --rm -t codeclimate/codeclimate-tslint .",
     "docker:run": "docker run -v $(pwd):/code codeclimate/codeclimate-tslint",
-    "test": "npm run build && npm run istanbul && npm run test:report",
+    "test": "npm run build && npm run istanbul",
     "test:watch": "npm run build:watch && npm run istanbul:watch",
     "test:mocha": "npm run build && npm run mocha",
     "mocha": "mocha dist/test/*.spec.js",
