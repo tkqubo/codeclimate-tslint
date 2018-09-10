@@ -6,3 +6,4 @@ test/*.js.map
 node_modules
 coverage
 docs/
+.nyc_output
