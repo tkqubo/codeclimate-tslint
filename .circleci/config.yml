@@ -1,0 +1,53 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/codeclimate-tslint
+    docker:
+      - image: node:8.11
+    steps:
+      - checkout
+      - run:
+          name: Install cc-test-reporter
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+      - restore_cache:
+          key: codeclimate-tslint-{{ .Branch }}-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+      - run:
+          name: Install dependencies
+          command: yarn install
+      - save_cache:
+          paths:
+            - ~/.cache/yarn
+          key: codeclimate-tslint-{{ .Branch }}-{{ checksum "package.json" }}-{{ checksum "yarn.lock" }}
+      - run:
+          name: Run tests
+          command: |
+            ./cc-test-reporter before-build
+            yarn test
+            ./cc-test-reporter after-build --exit-code $?
+      - store_artifacts:
+          path: coverage
+
+  deploy:
+    docker:
+      - image: debian
+        environment:
+          REPOSITORY: tkqubo/codeclimate-tslint
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: docker login -u $DOCKER_EMAIL -p $DOCKER_AUTH
+      - run: docker build -t=$REPOSITORY:b$CIRCLE_BUILD_NUM .
+      - run: docker push $REPOSITORY:b$CIRCLE_BUILD_NUM
+workflows:
+  version: 2
+  build-and-publish:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
