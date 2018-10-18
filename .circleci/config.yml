@@ -4,6 +4,8 @@ jobs:
     working_directory: ~/codeclimate-tslint
     docker:
       - image: node:8.11
+        environment:
+          CC_TEST_REPORTER_ID: 'a6e3ac5244e94afa515dd02af923e1205c3b56bb8969894fa4dd5deee012ac1d'
     steps:
       - checkout
       - run:
