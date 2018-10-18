@@ -33,13 +33,13 @@ jobs:
 
   deploy:
     docker:
-      - image: debian
+      - image: docker:17.05.0-ce-git
         environment:
           REPOSITORY: tkqubo/codeclimate-tslint
     steps:
       - checkout
       - setup_remote_docker
-      - run: docker login -u $DOCKER_EMAIL -p $DOCKER_AUTH
+      - run: docker login -u $DOCKER_USER -p $DOCKER_AUTH
       - run: docker build -t=$REPOSITORY:b$CIRCLE_BUILD_NUM .
       - run: docker push $REPOSITORY:b$CIRCLE_BUILD_NUM
 workflows:
