@@ -15,6 +15,7 @@ const rulesPath: string = '../docs/tslint-rules';
 const tslintEslintRulesPath = 'node_modules/tslint-eslint-rules/dist/rules';
 const codelyzerRulesPath = 'node_modules/codelyzer';
 const prettierRulesPath = 'node_modules/tslint-plugin-prettier/rules';
+const microsoftContribRulesPath = 'node_modules/tslint-plugin-prettier';
 
 const codeClimateConfig: IConfig = loadCodeClimateConfig(configPath);
 const ruleLoader = new RuleLoader(linterPath);
@@ -22,6 +23,7 @@ const rules: IRuleMetadata[] = (require(rulesPath) as IRuleMetadata[])
   .concat(ruleLoader.loadRules(tslintEslintRulesPath))
   .concat(ruleLoader.loadRules(codelyzerRulesPath))
   .concat(ruleLoader.loadRules(prettierRulesPath))
+  .concat(ruleLoader.loadRules(microsoftContribRulesPath))
 ;
 
 function loadCodeClimateConfig(file: string): IConfig {
