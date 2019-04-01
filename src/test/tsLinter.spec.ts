@@ -9,8 +9,9 @@ import {IConfig, IIssue} from '../codeclimateDefinitions';
 import {ContentRenderer} from '../contentRenderer';
 import {IConfigurationFile} from 'tslint/lib/configuration';
 import Utils from '../utils';
-import * as rx from 'rxjs/Rx';
 import {ConfigFileNormalizer} from '../configFileNormalizer';
+import {Observable} from 'rxjs';
+import {catchError, finalize, map, toArray} from 'rxjs/operators';
 
 const mock = require('mock-fs');
 const assert = require('power-assert');
@@ -156,22 +157,24 @@ describe('TsLinter', () => {
         }
       };
     }
-    function assertLintResult(actual: rx.Observable<IIssue>, expected: IIssue[], done: MochaDone): void {
+    function assertLintResult(actual: Observable<IIssue>, expected: IIssue[], done: MochaDone): void {
       actual
-      // skip body comparison
-        .map((result: IIssue) => {
-          result.content = { body: '' };
-          return result;
-        })
-        .toArray()
+        .pipe(
+          // skip body comparison
+          map((result: IIssue) => {
+            result.content = { body: '' };
+            return result;
+          }),
+          toArray(),
+          catchError(assert.fail.bind(assert)),
+          finalize(mock.restore.bind(mock))
+        )
         .subscribe(
-          actual => {
+          (actual: any) => {
             // Then
             assert.deepStrictEqual(actual, expected);
             done();
-          },
-          assert.fail.bind(assert),
-          mock.restore.bind(mock)
+          }
         );
     }
 

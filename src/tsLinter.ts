@@ -4,16 +4,16 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as _ from 'lodash';
 import * as rx from 'rxjs';
-import {Configuration, ILinterOptions, Linter} from 'tslint';
-import {IConfigurationFile} from 'tslint/lib/configuration';
+import {of} from 'rxjs';
+import {Configuration, ILinterOptions, Linter, RuleFailure} from 'tslint';
 import * as CodeClimate from './codeclimateDefinitions';
 import {FileMatcher} from './fileMatcher';
 import {IssueConverter} from './issueConverter';
 import {ITsLinterOption} from './tsLinterOption';
 import Utils from './utils';
-import {RuleFailure} from 'tslint/lib/language/rule/rule';
-import autobind from 'autobind-decorator';
 import {ConfigFileNormalizer} from './configFileNormalizer';
+import autobind from 'autobind-decorator';
+import {catchError, filter, flatMap, map} from 'rxjs/operators';
 
 export class TsLinter {
   static defaultTsLintFileName: string = 'tslint.json';
@@ -25,7 +25,7 @@ export class TsLinter {
   originalConfigPath: string;
   fileMatcher: FileMatcher;
   issueConverter: IssueConverter;
-  configurationFile: IConfigurationFile;
+  configurationFile: Configuration.IConfigurationFile;
 
   constructor(
     public option: ITsLinterOption, configFileNormalizer: ConfigFileNormalizer = new ConfigFileNormalizer(option.linterPath)
@@ -39,8 +39,8 @@ export class TsLinter {
 
   @autobind
   lint(): rx.Observable<CodeClimate.IIssue> {
-    return rx.Observable.from(this.listFiles())
-      .flatMap(this.doLint);
+    return of(...this.listFiles())
+      .pipe(flatMap(this.doLint));
   }
 
   @autobind
@@ -63,13 +63,15 @@ export class TsLinter {
 
     linter.lint(fileName, contents, this.configurationFile);
 
-    let observable: rx.Observable<RuleFailure> = rx.Observable.from(linter.getResult().failures);
+    let observable: rx.Observable<RuleFailure> = of(...linter.getResult().failures);
     if (this.option.codeClimateConfig.ignore_warnings) {
-      observable = observable.filter(failure => failure.getRuleSeverity() !== 'warning')
+      observable = observable.pipe(filter((failure) => failure.getRuleSeverity() !== 'warning'))
     }
     return observable
-      .map(this.issueConverter.convert)
-      .catch((e: any) => rx.Observable.of(Utils.createIssueFromError(e, this.getRelativeFilePath(fileName))))
+      .pipe(
+        map(this.issueConverter.convert),
+        catchError((e: any) => of(Utils.createIssueFromError(e, this.getRelativeFilePath(fileName))))
+      )
       ;
   }
 

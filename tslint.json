@@ -45,6 +45,7 @@
     "curly": false,
     "no-reference": false,
     "no-var-requires": false,
+    "no-submodule-imports": false,
     "ordered-imports": false,
     "no-trailing-whitespace": false
   },

@@ -5,6 +5,7 @@ import {TsLinter} from './tsLinter';
 import {IRuleMetadata} from 'tslint';
 import {IConfig} from './codeclimateDefinitions';
 import RuleLoader from './ruleLoader';
+import {map} from 'rxjs/operators';
 
 const configPath: string = '/config.json';
 const targetPath: string = '/code/';
@@ -41,6 +42,8 @@ const tsLinter: TsLinter = new TsLinter({
 
 tsLinter
   .lint()
-  .map((j) => JSON.stringify(j))
-  .map((json) => `${json}\u0000`)
+  .pipe(
+    map((j) => JSON.stringify(j)),
+    map((json) => `${json}\u0000`)
+  )
   .subscribe((line) => console.log(line));
