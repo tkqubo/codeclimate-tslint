@@ -56,6 +56,7 @@
     "zone.js": "^0.8.20"
   },
   "dependencies": {
+    "@kushki/tslint": "^5.0.2",
     "@types/handlebars": "^4.0.32",
     "codelyzer": "^4.0.2",
     "handlebars": "^4.0.6",
