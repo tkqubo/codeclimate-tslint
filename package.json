@@ -1,6 +1,6 @@
 {
   "name": "codeclimate-tslint",
-  "version": "0.10.3",
+  "version": "0.11.0",
   "description": "Code Climate TSLint-Engine for TypeScript",
   "main": "dist/index.js",
   "scripts": {
@@ -20,7 +20,12 @@
     "type": "git",
     "url": "git+https://github.com/tkqubo/codeclimate-tslint.git"
   },
-  "keywords": ["TypeScript", "tslint", "codeclimate", "Code Climate"],
+  "keywords": [
+    "TypeScript",
+    "tslint",
+    "codeclimate",
+    "Code Climate"
+  ],
   "author": "tkqubo",
   "license": "MIT",
   "bugs": {
@@ -75,11 +80,23 @@
     "tslint-react": "^4.0.0"
   },
   "nyc": {
-    "include": ["src/**/*.ts"],
-    "exclude": ["src/**/*.spec.ts"],
-    "extension": [".ts"],
-    "require": ["ts-node/register"],
-    "reporter": ["text", "html", "lcov"],
+    "include": [
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "src/**/*.spec.ts"
+    ],
+    "extension": [
+      ".ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "reporter": [
+      "text",
+      "html",
+      "lcov"
+    ],
     "sourceMap": true,
     "instrument": true
   }
