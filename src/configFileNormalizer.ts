@@ -1,10 +1,8 @@
 'use strict';
-
 import * as fs from 'fs';
 import * as path from 'path';
 import {RawConfigFile} from 'tslint/lib/configuration';
 import * as crypto from 'crypto';
-
 
 const JSONC: any = require('json-comments');
 
@@ -14,7 +12,9 @@ const tmpJsonPath = '/tmp/codeclimate-tslint';
  * Normalizes tsconfg.json file.
  * Currently doing these stuffs.
  * <ul>
- *   <li>Redirect rule directories if they are not found on the original path but are defined in the tslint base path</li>
+ *   <li>
+ *     Redirect rule directories if they are not found on the original path but are defined in the tslint base path
+ *   </li>
  * </ul>
  */
 export class ConfigFileNormalizer {
@@ -26,7 +26,8 @@ export class ConfigFileNormalizer {
     if (typeof rawConfig.rulesDirectory === 'string') {
       rawConfig.rulesDirectory = this.normalizeRulesDirectoryPath(rawConfig.rulesDirectory, altRulesDirectory);
     } else if (rawConfig.rulesDirectory !== undefined) {
-      rawConfig.rulesDirectory = rawConfig.rulesDirectory.map(dir => this.normalizeRulesDirectoryPath(dir, altRulesDirectory));
+      rawConfig.rulesDirectory =
+        rawConfig.rulesDirectory.map(dir => this.normalizeRulesDirectoryPath(dir, altRulesDirectory));
     }
     this.ensureTemporaryDirectory();
     const outPath = this.randomFilePath();

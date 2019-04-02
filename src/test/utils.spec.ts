@@ -1,5 +1,4 @@
 'use strict';
-
 import {RuleNameNotFoundError} from '../issueConverter';
 import * as CodeClimate from '../codeclimateDefinitions';
 import Utils from '../utils';
@@ -21,7 +20,10 @@ describe('Utils', () => {
       const path = 'some path';
       const e = new RuleNameNotFoundError('some-rule');
       const actual = Utils.createIssueFromError(e, path);
-      assert.equal(actual.description, `Sorry, description could not be provided due to the internal error:\n${e.stack}`);
+      assert.equal(
+        actual.description,
+        `Sorry, description could not be provided due to the internal error:\n${e.stack}`
+      );
       assert.equal(actual.type, CodeClimate.issueTypes.Issue);
       done();
     });

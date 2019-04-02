@@ -14,7 +14,7 @@ export default class RuleLoader {
     const rulePath = path.join(this.basePath, moduleRulePath);
     return fs.readdirSync(rulePath)
       .filter(this.isRuleFile)
-      .map(file => {
+      .map((file) => {
         const rule = require(path.join(rulePath, file)).Rule || { };
         if (rule.metadata) {
           return rule.metadata as IRuleMetadata;
@@ -28,6 +28,6 @@ export default class RuleLoader {
   }
 
   private isRuleFile(fileName: string): boolean {
-    return fileName.endsWith('Rule.js')
+    return fileName.endsWith('Rule.js');
   }
 }

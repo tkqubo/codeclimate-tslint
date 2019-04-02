@@ -1,5 +1,4 @@
 'use strict';
-
 const assert = require('power-assert');
 import {IRuleMetadata} from 'tslint';
 import {ContentRenderer} from '../contentRenderer';
@@ -30,7 +29,8 @@ describe('ContentRenderer', () => {
         requiresTypeInfo: true,
         typescriptOnly: true
       };
-      const optionExamples = (rule.optionExamples as string[]).map(o => '```json\n' + '"' + rule.ruleName + '": ' + o + '\n```').join('\n');
+      const optionExamples = (rule.optionExamples as string[])
+          .map(o => '```json\n' + '"' + rule.ruleName + '": ' + o + '\n```').join('\n');
       const options = '```json\n' + JSON.stringify(rule.options, null, 2) + '\n```';
       const expected = `# Rule: ${rule.ruleName}
 

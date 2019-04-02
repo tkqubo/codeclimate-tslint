@@ -1,5 +1,4 @@
 'use strict';
-
 import {fail, ok} from 'power-assert';
 import * as sinon from 'sinon';
 import * as ts from 'typescript';

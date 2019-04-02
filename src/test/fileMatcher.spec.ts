@@ -1,5 +1,4 @@
 'use strict';
-
 const assert = require('power-assert');
 import * as proxyquire from 'proxyquire';
 const globMock: any = {};
@@ -65,7 +64,7 @@ describe('FileMatcher', () => {
         `${basePath}src/lib/util.ts`
       ];
       // When
-      let actual = fileMatcher.matchFiles(['*.ts', 'src/**/*']);
+      const actual = fileMatcher.matchFiles(['*.ts', 'src/**/*']);
       // Then
       assert.deepStrictEqual(actual, expected);
       done();

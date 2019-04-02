@@ -9,8 +9,10 @@ export class FileMatcher {
 
   @autobind
   matchFiles(includePaths: string[]): string[] {
-    const expandedIncludePaths: string[] = _.flatten(includePaths.map((path) => glob.sync(`${this.basePath}${path}`)));
-    const [directories, files]: string[][] = _.partition(expandedIncludePaths, (file) => fs.lstatSync(file).isDirectory());
+    const expandedIncludePaths: string[] =
+      _.flatten(includePaths.map((path) => glob.sync(`${this.basePath}${path}`)));
+    const [directories, files]: string[][] =
+      _.partition(expandedIncludePaths, (file) => fs.lstatSync(file).isDirectory());
 
     return _.chain(directories)
       .map((directory) => glob.sync(`${directory}/**/**`))

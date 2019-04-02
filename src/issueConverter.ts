@@ -13,6 +13,7 @@ export class RuleNameNotFoundError extends Error {
   }
 }
 
+@autobind
 export class IssueConverter {
   readonly filePattern: RegExp;
   readonly contentRenderer: ContentRenderer;
@@ -22,7 +23,6 @@ export class IssueConverter {
     this.contentRenderer = new ContentRenderer(option.linterPath);
   }
 
-  @autobind
   convert(failure: RuleFailure): CodeClimate.IIssue {
     return {
       type: CodeClimate.issueTypes.Issue,
@@ -37,17 +37,15 @@ export class IssueConverter {
     };
   }
 
-  @autobind
   private contentBody(name: string): string {
     const rule: IRuleMetadata | null = _.find(this.option.rules, { ruleName: name });
     if (rule != null) {
       return this.contentRenderer.render(rule);
     } else {
-      throw new RuleNameNotFoundError(name)
+      throw new RuleNameNotFoundError(name);
     }
   }
 
-  @autobind
   private convertToLocation(failure: RuleFailure): CodeClimate.Location {
     return {
       path: this.getFilePath(failure),
