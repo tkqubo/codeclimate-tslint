@@ -15,7 +15,7 @@ const rulesPath: string = '../docs/tslint-rules';
 const tslintEslintRulesPath = 'node_modules/tslint-eslint-rules/dist/rules';
 const codelyzerRulesPath = 'node_modules/codelyzer';
 const prettierRulesPath = 'node_modules/tslint-plugin-prettier/rules';
-const microsoftContribRulesPath = 'node_modules/tslint-plugin-prettier';
+const microsoftContribRulesPath = 'node_modules/tslint-microsoft-contrib';
 
 const codeClimateConfig: IConfig = loadCodeClimateConfig(configPath);
 const ruleLoader = new RuleLoader(linterPath);
