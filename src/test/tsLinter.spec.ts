@@ -1,4 +1,5 @@
 'use strict';
+
 import * as path from 'path';
 import * as ts from 'typescript';
 import {ILinterOptions, IRuleMetadata, Linter, LintResult, RuleFailure} from 'tslint';
