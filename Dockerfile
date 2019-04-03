@@ -1,5 +1,6 @@
 FROM mhart/alpine-node:10
-LABEL maintainer "tkqubo <tk.qubo@gmail.com>"
+
+LABEL maintainer = "tkqubo <tk.qubo@gmail.com>"
 
 RUN adduser -u 9000 -D app
 

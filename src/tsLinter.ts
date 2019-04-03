@@ -4,15 +4,22 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as _ from 'lodash';
 import {Observable, of} from 'rxjs';
-import {Configuration, ILinterOptions, Linter, RuleFailure} from 'tslint';
-import * as CodeClimate from './codeclimateDefinitions';
+import {Configuration, ILinterOptions, IRuleMetadata, Linter, RuleFailure} from 'tslint';
+import * as CodeClimate from './codeclimate';
+import {IConfig} from './codeclimate';
 import {FileMatcher} from './fileMatcher';
 import {IssueConverter} from './issueConverter';
-import {ITsLinterOption} from './tsLinterOption';
 import Utils from './utils';
 import {ConfigFileNormalizer} from './configFileNormalizer';
 import autobind from 'autobind-decorator';
 import {catchError, filter, flatMap, map} from 'rxjs/operators';
+
+export interface ITsLinterOption {
+  targetPath: string;
+  linterPath: string;
+  codeClimateConfig: IConfig;
+  rules: IRuleMetadata[];
+}
 
 @autobind
 export class TsLinter {

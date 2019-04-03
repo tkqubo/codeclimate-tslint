@@ -1,7 +1,7 @@
 'use strict';
 
 import {IRuleMetadata} from 'tslint';
-import * as CodeClimate from './codeclimateDefinitions';
+import * as CodeClimate from './codeclimate';
 import {RuleNameNotFoundError} from './issueConverter';
 
 class Utils {

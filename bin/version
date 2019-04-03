@@ -2,4 +2,4 @@
 set -eu
 
 module=$1
-npm -j ls $module | jq -r '.dependencies["'$module'"].version'
+npm -j ls ${module} | jq -r '.dependencies["'${module}'"].version'

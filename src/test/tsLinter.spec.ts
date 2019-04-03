@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as ts from 'typescript';
 import {ILinterOptions, IRuleMetadata, Linter, LintResult, RuleFailure} from 'tslint';
 import {TsLinter} from '../tsLinter';
-import {IConfig, IIssue} from '../codeclimateDefinitions';
+import {IConfig, IIssue} from '../codeclimate';
 import {ContentRenderer} from '../contentRenderer';
 import {IConfigurationFile} from 'tslint/lib/configuration';
 import Utils from '../utils';

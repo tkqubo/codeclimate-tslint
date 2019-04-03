@@ -1,6 +1,6 @@
 'use strict';
 import {RuleNameNotFoundError} from '../issueConverter';
-import * as CodeClimate from '../codeclimateDefinitions';
+import * as CodeClimate from '../codeclimate';
 import Utils from '../utils';
 
 const mock = require('mock-fs');

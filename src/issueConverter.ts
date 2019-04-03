@@ -2,9 +2,9 @@
 
 import {IRuleMetadata, RuleFailure, RuleFailurePosition} from 'tslint';
 import * as _ from 'lodash';
-import * as CodeClimate from './codeclimateDefinitions';
+import * as CodeClimate from './codeclimate';
 import {ContentRenderer} from './contentRenderer';
-import {ITsLinterOption} from './tsLinterOption';
+import {ITsLinterOption} from './tsLinter';
 import autobind from 'autobind-decorator';
 
 export class RuleNameNotFoundError extends Error {

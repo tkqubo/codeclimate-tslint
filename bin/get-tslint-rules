@@ -2,7 +2,7 @@
 set -eu
 
 module=tslint
-version=${1-$(./bin/version $module)}
+version=${1-$(./bin/version ${module})}
 echo "Pulling rules.json from $module $version"
 
 git clone --quiet --branch "$version" https://github.com/palantir/tslint.git /tmp/tslint
@@ -14,6 +14,6 @@ yarn run compile:scripts
 yarn run docs
 cd -
 
-mkdir -p ./docs
-cp /tmp/tslint/docs/_data/rules.json ./docs/tslint-rules.json
+mkdir -p ./tslint/docs
+cp /tmp/tslint/docs/_data/rules.json ./tslint/docs/rules.json
 rm -rf /tmp/tslint

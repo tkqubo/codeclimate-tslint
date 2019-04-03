@@ -1,11 +1,11 @@
 'use strict';
+
 import {fail, ok} from 'power-assert';
 import * as sinon from 'sinon';
 import * as ts from 'typescript';
 import {IRuleMetadata, RuleFailure} from 'tslint';
 import {IssueConverter} from '../issueConverter';
-import * as CodeClimate from '../codeclimateDefinitions';
-import {IConfig} from '../codeclimateDefinitions';
+import {IConfig, ILineColumnPosition, IPositionLocation} from '../codeclimate';
 
 const assert = require('power-assert');
 
@@ -46,9 +46,9 @@ describe('IssueConverter', () => {
       assert(actual.categories[0] === 'Style');
       assert(actual.check_name === ruleName);
       assert(actual.description === failure);
-      const location = actual.location as CodeClimate.IPositionLocation;
-      const begin = location.positions.begin as CodeClimate.ILineColumnPosition;
-      const end = location.positions.end as CodeClimate.ILineColumnPosition;
+      const location = actual.location as IPositionLocation;
+      const begin = location.positions.begin as ILineColumnPosition;
+      const end = location.positions.end as ILineColumnPosition;
       assert(location.path === sourcePath);
       assert(begin.line === 3);
       assert(begin.column === 31);

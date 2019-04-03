@@ -1,5 +1,7 @@
 'use strict';
 
+import * as fs from 'fs';
+
 export type Location = ILineLocation|IPositionLocation;
 export type Position = ILineColumnPosition|IOffsetPosition;
 
@@ -66,3 +68,12 @@ export const issueTypes = {
 export type Category = 'Bug Risk'|'Clarity'|'Compatibility'|'Complexity'|'Duplication'|'Performance'|'Security'|'Style';
 
 export type Severity = 'info'|'normal'|'critical';
+
+export function loadCodeClimateConfig(file: string): IConfig {
+  if (fs.existsSync(file) && fs.statSync(file).isFile()) {
+    return JSON.parse(fs.readFileSync(file).toString('utf-8'));
+  } else {
+    console.warn(`${file} does not exist, so defaulting to process all the file under the 'src' directory`);
+    return {enabled: true, include_paths: ['src']};
+  }
+}
