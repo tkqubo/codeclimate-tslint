@@ -16,6 +16,9 @@ export type RulesDirectory = string | string[] | undefined;
  *   <li>
  *     Resolve rules directories if they are not found on the original path but defined in the tslint base path
  *   </li>
+ *   <li>
+ *     Make rules directories as absolute paths
+ *   </li>
  * </ul>
  */
 export function normalizeTsConfig(input: string, altBase: string): string {

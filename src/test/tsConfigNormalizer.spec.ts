@@ -35,7 +35,9 @@ describe('tsConfigNormalizer', () => {
       });
       const expectedNormalizedConfig: RawConfigFile = {
         ...originalConfig,
-        rulesDirectory: [existentOnBase, path.join(altBase, existentOnAltBase), existentOnBoth, nonexistent],
+        rulesDirectory: [
+          existentOnBase, path.join(altBase, existentOnAltBase), existentOnBoth, nonexistent
+        ].map(p => path.resolve(p)),
       };
       // When
       const actual = normalizeTsConfig(input, altBase);
@@ -90,7 +92,7 @@ describe('tsConfigNormalizer', () => {
       // When
       const actual = resolveRulesDirectory(expected, altBase);
       // Then
-      assert.deepStrictEqual(actual, expected);
+      assert.deepStrictEqual(actual, path.resolve(expected));
     });
     it('should resolve rules directory when it does not exist but does on alternative base', async () => {
       // Given
@@ -100,7 +102,7 @@ describe('tsConfigNormalizer', () => {
       // When
       const actual = resolveRulesDirectory(dir, altBase);
       // Then
-      assert.deepStrictEqual(actual, expected);
+      assert.deepStrictEqual(actual, path.resolve(expected));
     });
     it('should retain rules directory when it does not exist', async () => {
       // Given
@@ -108,7 +110,7 @@ describe('tsConfigNormalizer', () => {
       // When
       const actual = resolveRulesDirectory(expected, altBase);
       // Then
-      assert.deepStrictEqual(actual, expected);
+      assert.deepStrictEqual(actual, path.resolve(expected));
     });
     it('should resolve string array', async () => {
       // Given
@@ -129,7 +131,7 @@ describe('tsConfigNormalizer', () => {
         altBase
       );
       // Then
-      assert.deepStrictEqual(actual, expected);
+      assert.deepStrictEqual(actual, expected.map(p => path.resolve(p)));
     });
     it('should not resolve undefined rules directory', async () => {
       // Given
