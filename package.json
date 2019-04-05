@@ -59,6 +59,7 @@
     "proxyquire": "^2.1.0",
     "sinon": "^7.3.1",
     "ts-node": "^8.0.3",
+    "tslint-sonarts": "^1.9.0",
     "typescript": "^3.3.3333",
     "zone.js": "~0.8.26"
   },

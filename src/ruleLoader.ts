@@ -10,10 +10,11 @@ import Utils from './utils';
 export const tslintRuleFile: string = '../tslint/docs/rules';
 /** Rule paths that are provided by third parties */
 export const additionalRulePaths = [
-  'node_modules/tslint-eslint-rules/dist/rules',
-  'node_modules/codelyzer',
-  'node_modules/tslint-plugin-prettier/rules',
-  'node_modules/tslint-microsoft-contrib',
+  'codelyzer',
+  'tslint-eslint-rules/dist/rules',
+  'tslint-microsoft-contrib',
+  'tslint-plugin-prettier/rules',
+  'tslint-sonarts/lib/rules',
 ];
 
 export function getRules(additionalRuleBasePath: string): IRuleMetadata[] {
@@ -26,6 +27,7 @@ export function getTslintRules(): IRuleMetadata[] {
 
 export function getAdditionalRules(basePath: string): IRuleMetadata[] {
   const rules = additionalRulePaths
+    .map(p => `node_modules/${p}`)
     .map(p => path.join(basePath, p))
     .map(loadRules);
   return _.flatten(rules);
@@ -35,7 +37,7 @@ export function loadRules(rulePath: string): IRuleMetadata[] {
   return fs.readdirSync(rulePath)
     .filter(isRuleFile)
     .map(file => {
-      const rule = require(path.join(rulePath, file)).Rule || { };
+      const rule = require(path.join(rulePath, file)).Rule || {};
       if (rule.metadata) {
         return rule.metadata as IRuleMetadata;
       } else {
