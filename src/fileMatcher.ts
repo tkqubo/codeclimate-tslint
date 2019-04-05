@@ -4,10 +4,10 @@ import * as glob from 'glob';
 import * as _ from 'lodash';
 import autobind from 'autobind-decorator';
 
+@autobind
 export class FileMatcher {
   constructor(public basePath: string, public extensions: string[]) { }
 
-  @autobind
   matchFiles(includePaths: string[]): string[] {
     const expandedIncludePaths: string[] =
       _.flatten(includePaths.map((path) => glob.sync(`${this.basePath}${path}`)));
@@ -22,13 +22,11 @@ export class FileMatcher {
       .value();
   }
 
-  @autobind
   private prunePathsWithinSymlinks(paths: string[]): string[] {
     const symlinks = paths.filter((path) => fs.lstatSync(path).isSymbolicLink());
     return paths.filter((path) => symlinks.every((symlink) => path.indexOf(symlink) !== 0));
   }
 
-  @autobind
   private isFileWithMatchingExtension(file: string): boolean {
     const stats = fs.lstatSync(file);
     const extension = '.' + file.split('.').pop();

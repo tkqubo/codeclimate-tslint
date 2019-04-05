@@ -10,7 +10,7 @@ import {IConfig} from './codeclimate';
 import {FileMatcher} from './fileMatcher';
 import {IssueConverter} from './issueConverter';
 import Utils from './utils';
-import {ConfigFileNormalizer} from './configFileNormalizer';
+import {normalizeTsConfig} from './tsConfigNormalizer';
 import autobind from 'autobind-decorator';
 import {catchError, filter, flatMap, map} from 'rxjs/operators';
 
@@ -29,20 +29,23 @@ export class TsLinter {
     fix: false,
     formatter: 'json'
   };
-  originalConfigPath: string;
+
   fileMatcher: FileMatcher;
   issueConverter: IssueConverter;
   configurationFile: Configuration.IConfigurationFile;
 
-  constructor(
-    public option: ITsLinterOption,
-    configFileNormalizer: ConfigFileNormalizer = new ConfigFileNormalizer(option.linterPath)
-  ) {
+  constructor(public option: ITsLinterOption) {
     this.fileMatcher = new FileMatcher(option.targetPath, ['.ts', '.tsx']);
     this.issueConverter = new IssueConverter(option);
-    this.originalConfigPath = this.getTsLintFilePath();
-    const normalizedConfigPath = configFileNormalizer.normalize(this.originalConfigPath, option.linterPath);
+    const normalizedConfigPath = normalizeTsConfig(this.getTsLintFile(), option.linterPath);
     this.configurationFile = Configuration.findConfiguration(normalizedConfigPath, '').results;
+  }
+
+  getTsLintFile(): string  {
+    return _.find([
+      path.join(this.option.targetPath, this.option.codeClimateConfig.config || TsLinter.defaultTsLintFileName),
+      path.join(this.option.linterPath, TsLinter.defaultTsLintFileName)
+    ], (file) => fs.existsSync(file));
   }
 
   lint(): Observable<CodeClimate.IIssue> {
@@ -62,13 +65,6 @@ export class TsLinter {
 
   protected createLinter(): Linter {
     return new Linter(this.linterOption);
-  }
-
-  private getTsLintFilePath(): string {
-    return _.find([
-      path.join(this.option.targetPath, this.option.codeClimateConfig.config || TsLinter.defaultTsLintFileName),
-      path.join(this.option.linterPath, TsLinter.defaultTsLintFileName)
-    ], (file) => fs.existsSync(file));
   }
 
   private doLint(fileName: string): Observable<CodeClimate.IIssue> {

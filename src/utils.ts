@@ -3,6 +3,9 @@
 import {IRuleMetadata} from 'tslint';
 import * as CodeClimate from './codeclimate';
 import {RuleNameNotFoundError} from './issueConverter';
+import * as path from 'path';
+import * as crypto from 'crypto';
+import * as fs from 'fs';
 
 class Utils {
   createEmptyRuleMetadata(ruleName: string): IRuleMetadata {
@@ -43,3 +46,15 @@ class Utils {
 }
 
 export default new Utils();
+
+export const temporaryDir = '/tmp/codeclimate-tslint';
+
+export function getTemporaryFileName(extension: string = 'json'): string {
+  return path.join(temporaryDir, `${crypto.randomBytes(32).toString('hex')}.${extension}`);
+}
+
+export function ensureTemporaryDir() {
+  if (!fs.existsSync(temporaryDir)) {
+    fs.mkdirSync(temporaryDir);
+  }
+}
