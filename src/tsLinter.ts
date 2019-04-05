@@ -5,8 +5,7 @@ import * as path from 'path';
 import * as _ from 'lodash';
 import {Observable, of} from 'rxjs';
 import {Configuration, ILinterOptions, IRuleMetadata, Linter, RuleFailure} from 'tslint';
-import * as CodeClimate from './codeclimate';
-import {IConfig} from './codeclimate';
+import {IConfig, IIssue} from './codeclimate';
 import {FileMatcher} from './fileMatcher';
 import {IssueConverter} from './issueConverter';
 import Utils from './utils';
@@ -48,7 +47,7 @@ export class TsLinter {
     ], (file) => fs.existsSync(file));
   }
 
-  lint(): Observable<CodeClimate.IIssue> {
+  lint(): Observable<IIssue> {
     return of(...this.listFiles())
       .pipe(flatMap(this.doLint));
   }
@@ -67,7 +66,7 @@ export class TsLinter {
     return new Linter(this.linterOption);
   }
 
-  private doLint(fileName: string): Observable<CodeClimate.IIssue> {
+  private doLint(fileName: string): Observable<IIssue> {
     const contents = fs.readFileSync(fileName, 'utf8');
     const linter: Linter = this.createLinter();
 
