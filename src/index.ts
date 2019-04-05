@@ -26,7 +26,7 @@ const tsLinter: TsLinter = new TsLinter({
 tsLinter
   .lint()
   .pipe(
-    map((j) => JSON.stringify(j)),
-    map((json) => `${json}\u0000`)
+    map(j => JSON.stringify(j)),
+    map(json => `${json}\u0000`)
   )
-  .subscribe((line) => console.log(line));
+  .subscribe(line => console.log(line));
