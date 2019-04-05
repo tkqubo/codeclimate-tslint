@@ -17,28 +17,28 @@ export type RulesDirectory = string | string[] | undefined;
  *   </li>
  * </ul>
  */
-export function normalizeTsConfig(input: string, altRulesDirectory: string): string {
+export function normalizeTsConfig(input: string, altBase: string): string {
   const config = load(input);
-  config.rulesDirectory = resolveRulesDirectory(config.rulesDirectory, altRulesDirectory);
+  config.rulesDirectory = resolveRulesDirectory(config.rulesDirectory, altBase);
   const output = getTemporaryFileName();
   save(config, output);
   return output;
 }
 
-function load(file: string): RawConfigFile {
+export function load(file: string): RawConfigFile {
   return JSON.parse(stripJsonComments(fs.readFileSync(file).toString('UTF-8')));
 }
 
-function save(rawConfig: RawConfigFile, file: string): void {
+export function save(rawConfig: RawConfigFile, file: string): void {
   ensureTemporaryDir();
   fs.writeFileSync(file, JSON.stringify(rawConfig), 'UTF-8');
 }
 
 /** Resolves rules directories */
-export function resolveRulesDirectory(rulesDirectory: RulesDirectory, alternativeRulesDir: string): RulesDirectory {
+export function resolveRulesDirectory(rulesDirectory: RulesDirectory, altBase: string): RulesDirectory {
   function normalizeRulesDirectoryPath(dir: string): string {
-    if (!fs.existsSync(dir) && fs.existsSync(path.join(alternativeRulesDir, dir))) {
-      return path.join(alternativeRulesDir, dir);
+    if (!fs.existsSync(dir) && fs.existsSync(path.join(altBase, dir))) {
+      return path.join(altBase, dir);
     }
     return dir;
   }
