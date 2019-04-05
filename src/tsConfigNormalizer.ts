@@ -1,4 +1,5 @@
 'use strict';
+
 import * as fs from 'fs';
 import * as path from 'path';
 import {RawConfigFile} from 'tslint/lib/configuration';
@@ -34,20 +35,20 @@ export function save(rawConfig: RawConfigFile, file: string): void {
   fs.writeFileSync(file, JSON.stringify(rawConfig), 'UTF-8');
 }
 
+function normalizeRulesDirectoryPath(dir: string, altBase: string): string {
+  if (!fs.existsSync(dir) && fs.existsSync(path.join(altBase, dir))) {
+    return path.resolve(path.join(altBase, dir));
+  }
+  return path.resolve(dir);
+}
+
 /** Resolves rules directories */
 export function resolveRulesDirectory(rulesDirectory: RulesDirectory, altBase: string): RulesDirectory {
-  function normalizeRulesDirectoryPath(dir: string): string {
-    if (!fs.existsSync(dir) && fs.existsSync(path.join(altBase, dir))) {
-      return path.join(altBase, dir);
-    }
-    return dir;
-  }
-
   if (!rulesDirectory) {
     return rulesDirectory;
   } else if (typeof rulesDirectory === 'string') {
-    return normalizeRulesDirectoryPath(rulesDirectory);
+    return normalizeRulesDirectoryPath(rulesDirectory, altBase);
   } else {
-    return rulesDirectory.map(normalizeRulesDirectoryPath);
+    return rulesDirectory.map(dir => normalizeRulesDirectoryPath(dir, altBase));
   }
 }

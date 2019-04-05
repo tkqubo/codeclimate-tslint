@@ -1,5 +1,6 @@
 {
-  "extends": "tslint:latest",
+  "extends": ["tslint:latest"],
+  "rulesDirectory": [],
   "rules": {
     "angular-whitespace": [true, "check-interpolation", "check-semicolon"],
     "banana-in-box": true,
@@ -35,6 +36,7 @@
     "arrow-parens": false,
     "max-classes-per-file": false,
     "no-implicit-dependencies": false,
+    "no-case-with-or": true,
     "no-console": false,
     "whitespace": [true,
       "check-decl",
@@ -51,6 +53,5 @@
     "no-submodule-imports": false,
     "ordered-imports": false,
     "no-trailing-whitespace": false
-  },
-  "rulesDirectory": []
+  }
 }
