@@ -6,6 +6,6 @@
     "email": "tk.qubo@gmail.com"
   },
   "languages" : ["TypeScript"],
-  "version": "THIS_VALUE_IS_REPLACED_BY_TSLINT_VERSION",
+  "version": "(generated)",
   "spec_version": "0.3.1"
 }
