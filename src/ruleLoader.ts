@@ -14,6 +14,8 @@ export const additionalRulePaths = [
   'tslint-eslint-rules/dist/rules',
   'tslint-microsoft-contrib',
   'tslint-plugin-prettier/rules',
+  'tslint-react/rules',
+  'tslint-react-hooks/dist',
   'tslint-sonarts/lib/rules',
 ];
 
