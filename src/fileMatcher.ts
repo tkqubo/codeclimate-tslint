@@ -19,7 +19,7 @@ export class FileMatcher {
       .flatMap(this.prunePathsWithinSymlinks)
       .concat(files)
       .filter(this.isFileWithMatchingExtension)
-      .value();
+      .value() as string[];
   }
 
   private prunePathsWithinSymlinks(paths: string[]): string[] {
