@@ -29,7 +29,15 @@ export function normalizeTsConfig(input: string, altBase: string): string {
   return output;
 }
 
+function isJSFile(file: string) {
+  return file.endsWith('.js');
+}
+
 export function load(file: string): RawConfigFile {
+  if (isJSFile(file)) {
+    return require(file);
+  }
+
   return JSON.parse(stripJsonComments(fs.readFileSync(file).toString('UTF-8')));
 }
 

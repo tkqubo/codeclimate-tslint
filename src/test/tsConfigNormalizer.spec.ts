@@ -70,6 +70,16 @@ describe('tsConfigNormalizer', () => {
       // Then
       assert.deepStrictEqual(actual, expected);
     });
+
+    it('should load JS', async () => {
+      // Given
+      const fileName = path.join(__dirname, 'mockConfig.js');
+      const expected: any = {key1: 'value', key2: 123, key4: false, key5: null};
+      // When
+      const actual = load(fileName);
+      // Then
+      assert.deepStrictEqual(actual, expected);
+    });
   });
   describe('save', () => {
     it('should save JSON', async () => {
