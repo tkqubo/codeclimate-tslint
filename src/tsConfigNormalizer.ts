@@ -25,9 +25,7 @@ export function normalizeTsConfig(input: string, altBase: string): string {
   const config = load(input);
   config.rulesDirectory = resolveRulesDirectory(config.rulesDirectory, altBase);
   const output = getTemporaryFileName();
-  if (!isJSFile(input)) {
-    save(config, output);
-  }
+  save(config, output);
   return output;
 }
 
