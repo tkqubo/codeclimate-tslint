@@ -25,11 +25,21 @@ export function normalizeTsConfig(input: string, altBase: string): string {
   const config = load(input);
   config.rulesDirectory = resolveRulesDirectory(config.rulesDirectory, altBase);
   const output = getTemporaryFileName();
-  save(config, output);
+  if (!isJSFile(input)) {
+    save(config, output);
+  }
   return output;
 }
 
+function isJSFile(file: string) {
+  return file.endsWith('.js');
+}
+
 export function load(file: string): RawConfigFile {
+  if (isJSFile(file)) {
+    return require(file);
+  }
+
   return JSON.parse(stripJsonComments(fs.readFileSync(file).toString('UTF-8')));
 }
 
