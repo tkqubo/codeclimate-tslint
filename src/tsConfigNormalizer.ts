@@ -6,6 +6,7 @@ import {RawConfigFile} from 'tslint/lib/configuration';
 import {ensureTemporaryDir, getTemporaryFileName} from './utils';
 
 import * as stripJsonComments from 'strip-json-comments';
+import * as yaml from 'js-yaml';
 
 export type RulesDirectory = string | string[] | undefined;
 
@@ -33,12 +34,22 @@ function isJSFile(file: string) {
   return file.endsWith('.js');
 }
 
+function isYAMLFile(file: string) {
+  return /\.(yaml|yml)$/.test(file);
+}
+
 export function load(file: string): RawConfigFile {
   if (isJSFile(file)) {
     return require(file);
   }
 
-  return JSON.parse(stripJsonComments(fs.readFileSync(file).toString('UTF-8')));
+  // Read in file
+  const content = fs.readFileSync(file).toString('UTF-8');
+  
+  // Parse if yaml, else use plain content
+  const json = isYAMLFile(file) ? yaml.safeLoad(content) : content;
+
+  return JSON.parse(stripJsonComments(json));
 }
 
 export function save(rawConfig: RawConfigFile, file: string): void {
