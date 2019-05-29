@@ -39,7 +39,6 @@ function isYAMLFile(file: string) {
 }
 
 export function load(file: string): RawConfigFile {
-  // Check if its a .js file, use require
   if (isJSFile(file)) {
     return require(file);
   }
