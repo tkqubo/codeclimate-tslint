@@ -30,15 +30,25 @@ export function normalizeTsConfig(input: string, altBase: string): string {
   return output;
 }
 
+function isJSFile(file: string) {
+  return file.endsWith('.js');
+}
+
+function isYAMLFile(file: string) {
+  return /\.(yaml|yml)$/.test(file);
+}
+
 export function load(file: string): RawConfigFile {
   // Check if its a .js file, use require
-  if (file.endsWith('.js')) return require(file);
+  if (isJSFile(file)) {
+    return require(file);
+  }
 
   // Read in file
   const content = fs.readFileSync(file).toString('UTF-8');
   
   // Parse if yaml, else use plain content
-  const json = (/\.(yaml|yml)$/.test(file)) ? yaml.safeLoad(content) : content;
+  const json = isYAMLFile(file) ? yaml.safeLoad(content) : content;
 
   return JSON.parse(stripJsonComments(json));
 }
