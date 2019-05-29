@@ -65,6 +65,7 @@
   },
   "dependencies": {
     "@kushki/tslint": "^5.2.8",
+    "@types/js-yaml": "^3.12.1",
     "autobind-decorator": "^2.4.0",
     "codelyzer": "^5.0.1",
     "glob": "^7.1.4",
