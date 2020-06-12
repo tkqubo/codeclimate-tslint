@@ -2,9 +2,11 @@
 
 [![CircleCI](https://img.shields.io/circleci/project/tkqubo/codeclimate-tslint.svg)](https://circleci.com/gh/tkqubo/codeclimate-tslint)
 [![Code Climate](https://codeclimate.com/github/tkqubo/codeclimate-tslint/badges/gpa.svg)](https://codeclimate.com/github/tkqubo/codeclimate-tslint)
-[![Code Climate](https://img.shields.io/codeclimate/coverage/github/tkqubo/codeclimate-tslint.svg)](https://codeclimate.com/github/tkqubo/codeclimate-tslint/coverage)
 ![David](https://david-dm.org/tkqubo/codeclimate-tslint.svg)
 [![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)
+
+:warning: __TSLint has been deprecated as of 2019.__
+Please see this issue for more details: [Roadmap: TSLint → ESLint](https://github.com/palantir/tslint/issues/4534). [typescript-eslint](https://github.com/typescript-eslint/typescript-eslint) is now your best option for linting TypeScript.
 
 `codeclimate-tslint` is a Code Climate engine that wraps [tslint](http://palantir.github.io/tslint/). You can run it on your command line using the Code Climate CLI, or on Code Climate's hosted analysis platform.
 
