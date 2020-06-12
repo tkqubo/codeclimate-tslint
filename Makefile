@@ -1,27 +1,26 @@
-.PHONY: image test citest update_version release
+.PHONY: image test release
 
 MODULE_NAME ?= codeclimate-tslint
 IMAGE_NAME ?= codeclimate/$(MODULE_NAME)
 RELEASE_REGISTRY ?= us.gcr.io/code_climate
 RELEASE_TAG ?= latest
-TEST_IMAGE_NAME ?= $(IMAGE_NAME)-test
 
 image:
 	docker build --rm -t $(IMAGE_NAME) .
 
-test-image: image
-	docker build --rm -t $(TEST_IMAGE_NAME) -f Dockerfile.test .
+shell: image
+	docker container run \
+	--volume $(PWD):/usr/src/app \
+	-u root \
+	--tty \
+	--interactive \
+	$(IMAGE_NAME) \
+	sh
 
-test:
-	@$(MAKE) test-image > /dev/null
-	docker run \
-        -e PAGER=more \
-        --tty --interactive --rm \
-        $(TEST_IMAGE_NAME)
-
-update_database:
-	date > DATABASE_VERSION
-	make image
+test: image
+	docker container run \
+	$(IMAGE_NAME) \
+	/bin/sh -c 'cd /usr/src/app && yarn test'
 
 release:
 	docker tag $(IMAGE_NAME) $(RELEASE_REGISTRY)/$(MODULE_NAME):$(RELEASE_TAG)
